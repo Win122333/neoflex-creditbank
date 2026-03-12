@@ -1,0 +1,7 @@
+calculator:
+  rate: 20
+  insurance:
+    costInPercent: 0.10
+    discount: 5
+  salary:
+    discount: 1

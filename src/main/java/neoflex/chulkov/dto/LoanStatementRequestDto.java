@@ -2,11 +2,12 @@ package neoflex.chulkov.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.*;
+import lombok.Builder;
 import neoflex.chulkov.annotation.Adult;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-
+@Builder
 public record LoanStatementRequestDto(
         @NotNull(message = "Сумма кредита не может быть пустой")
         @Min(value = 20000, message = "Сумма кредита не может быть меньше 20000")
