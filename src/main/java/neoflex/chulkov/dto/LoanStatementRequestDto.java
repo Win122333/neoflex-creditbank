@@ -15,15 +15,12 @@ public record LoanStatementRequestDto(
         @Min(value = 6, message = "Срок кредита не может быть меньше 6 месяцев")
         Integer term,
         @NotBlank
-        @Pattern(regexp = "^[a-zA-Z]+$", message = "Имя может содержать только латинские символы")
-        @Size(min = 2, max = 30, message = "Имя должно быть от 2 до 30 символов")
+        @Pattern(regexp = "^[a-zA-Z]{2,30}?$", message = "Имя должно состоять из 2 - 30 латинских символов")
         String firstName,
         @NotBlank
-        @Pattern(regexp = "^[a-zA-Z]+$", message = "Фамилия может содержать только латинские символы")
-        @Size(min = 2, max = 30, message = "Фамилия должно быть от 2 до 30 символов")
+        @Pattern(regexp = "^[a-zA-Z]{2,30}?$", message = "Фамилия должна состоять из 2 - 30 латинских символов")
         String lastName,
-        @Pattern(regexp = "^[a-zA-Z]{2,30}?$", message = "Отчество должно быть от 2 до 30 символов")
-        @Size(min = 2, max = 30, message = "Отчество должно быть от 2 до 30 латинских символов")
+        @Pattern(regexp = "^[a-zA-Z]{2,30}?$", message = "Отчество должно состоять из 2 - 30 латинских символов")
         String middleName,
         @Pattern(regexp = "^[a-z0-9A-Z_!#$%&'*+/=?`{|}~^.-]+@[a-z0-9A-Z.-]+$", message = "Неверный формат email")
         String email,
