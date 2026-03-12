@@ -5,3 +5,6 @@ calculator:
     discount: 5
   salary:
     discount: 1
+
+server:
+  port: 8081
