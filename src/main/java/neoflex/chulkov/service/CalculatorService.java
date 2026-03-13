@@ -28,7 +28,6 @@ public class CalculatorService {
     @Value("${calculator.rate:20}")
     private BigDecimal baseRate;
     private static final int SCALE_INTERMEDIATE = 10;
-    private static final int SCALE_RATE = 8;
     private static final int SCALE_MONEY = 2;
     private static final int SCALE_PSK = 4;
     private static final int MONTHS_IN_YEAR = 12;
