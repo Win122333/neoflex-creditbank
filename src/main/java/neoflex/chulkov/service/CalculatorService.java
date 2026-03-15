@@ -6,7 +6,6 @@ import neoflex.chulkov.config.CalculatorProperties;
 import neoflex.chulkov.dto.*;
 import neoflex.chulkov.dto.enums.*;
 import neoflex.chulkov.exception.ScoringException;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -28,8 +27,8 @@ public class CalculatorService {
     private static final int MONTHS_IN_YEAR = 12;
     private static final int PERCENT_DIVISOR = 100;
 
-
     public List<LoanOfferDto> getAvailableOffers(LoanStatementRequestDto req) {
+        log.debug("ПРОМЕЖУТОЧНЫЙ ШАГ: Начало генерации предложений. Сумма={}, Срок={}", req.amount(), req.term());
         List<LoanOfferDto> offers = new ArrayList<>(4);
         offers.add(createOffer(false, false, req));
         offers.add(createOffer(false, true, req));
@@ -37,23 +36,27 @@ public class CalculatorService {
         offers.add(createOffer(true, true, req));
         offers.sort(Comparator.comparing(LoanOfferDto::rate).reversed());
 
+        log.debug("ПРОМЕЖУТОЧНЫЙ ШАГ: Сгенерировано и отсортировано {} предложений", offers.size());
         return offers;
     }
+
     private LoanOfferDto createOffer(
             Boolean isInsuranceEnabled,
             Boolean isSalaryClient,
             LoanStatementRequestDto req
-
     ) {
+        log.debug("ПРОМЕЖУТОЧНЫЙ ШАГ: Создание предложения (Страховка={}, Зарплатник={})", isInsuranceEnabled, isSalaryClient);
         BigDecimal insuranceCost = calculateInsuranceCost(req.amount(), isInsuranceEnabled);
         BigDecimal totalAmount = req.amount().add(insuranceCost);
         BigDecimal rate = properties.rate();
+
         if (isInsuranceEnabled) {
             rate = rate.subtract(properties.insurance().discount());
         }
         if (isSalaryClient) {
             rate = rate.subtract(properties.salary().discount());
         }
+
         BigDecimal monthlyPayment = calculateMonthlyPayment(totalAmount, req.term(), rate);
 
         return LoanOfferDto.builder()
@@ -65,16 +68,20 @@ public class CalculatorService {
                 .requestedAmount(req.amount())
                 .term(req.term())
                 .build();
-
     }
+
     private BigDecimal calculateInsuranceCost(BigDecimal amount, boolean isInsuranceEnabled) {
         if (!isInsuranceEnabled) {
+            log.debug("ПРОМЕЖУТОЧНЫЙ ШАГ: Страховка отключена. Стоимость = 0");
             return BigDecimal.ZERO;
         }
-        return amount.multiply(properties.insurance().costInPercent()).setScale(2, RoundingMode.HALF_UP);
+        BigDecimal cost = amount.multiply(properties.insurance().costInPercent()).setScale(2, RoundingMode.HALF_UP);
+        log.debug("ПРОМЕЖУТОЧНЫЙ ШАГ: Страховка включена. Рассчитанная стоимость = {}", cost);
+        return cost;
     }
+
     private BigDecimal calculateMonthlyPayment(BigDecimal amount, Integer term, BigDecimal rate) {
-        log.debug("Calculating monthly payment: amount={}, term={}, rate={}", amount, term, rate);
+        log.debug("ПРОМЕЖУТОЧНЫЙ ШАГ: Расчет аннуитетного платежа: amount={}, term={}, rate={}", amount, term, rate);
 
         if (rate.compareTo(BigDecimal.ZERO) == 0) {
             return amount.divide(BigDecimal.valueOf(term), SCALE_MONEY, RoundingMode.HALF_UP);
@@ -97,14 +104,21 @@ public class CalculatorService {
 
         return exactPayment.setScale(SCALE_MONEY, RoundingMode.HALF_UP);
     }
+
     public CreditDto calculateCredit(ScoringDataDto scoringDataDto) {
+        log.debug("ПРОМЕЖУТОЧНЫЙ ШАГ: Старт полного расчета кредита и графиков");
         performScoring(scoringDataDto);
+        log.debug("ПРОМЕЖУТОЧНЫЙ ШАГ: Скоринг пройден успешно");
+
         BigDecimal rate = calculateRate(scoringDataDto);
         BigDecimal psk = calculatePsk(scoringDataDto.term(), rate);
         BigDecimal amount = scoringDataDto.amount()
                 .add(calculateInsuranceCost(scoringDataDto.amount(), scoringDataDto.isInsuranceEnabled()));
         BigDecimal monthlyPayment = calculateMonthlyPayment(amount, scoringDataDto.term(), rate);
         var schedulePayment = calculateSchedulePayment(amount, scoringDataDto.term(), rate, monthlyPayment);
+
+        log.debug("ПРОМЕЖУТОЧНЫЙ ШАГ: Кредит успешно рассчитан. Итоговая сумма={}, ПСК={}", amount, psk);
+
         return new CreditDto(
                 amount,
                 scoringDataDto.term(),
@@ -116,30 +130,36 @@ public class CalculatorService {
                 schedulePayment
         );
     }
+
     private BigDecimal calculateRate(ScoringDataDto applicant) {
         int age = Period.between(applicant.birthdate(), LocalDate.now()).getYears();
         BigDecimal rate = properties.rate();
         EmploymentDto employer = applicant.employment();
+        log.debug("ПРОМЕЖУТОЧНЫЙ ШАГ: Начало расчета индивидуальной ставки. Базовая ставка = {}", rate);
 
         if (applicant.isInsuranceEnabled())
             rate = rate.subtract(properties.insurance().discount());
         if (applicant.isSalaryClient())
             rate = rate.subtract(properties.salary().discount());
+
         //employment status
         if (employer.employmentStatus() == EmploymentStatus.SELF_EMPLOYED)
             rate = rate.add(BigDecimal.valueOf(2));
         if (employer.employmentStatus() == EmploymentStatus.BUSINESS_OWNER)
             rate = rate.add(BigDecimal.valueOf(1));
+
         //position
         if (employer.position() == Position.MIDDLE_MANAGER)
             rate = rate.subtract(BigDecimal.valueOf(2));
         if (employer.position() == Position.TOP_MANAGER)
             rate = rate.subtract(BigDecimal.valueOf(3));
+
         //marital status
         if (applicant.maritalStatus() == MaritalStatus.MARRIED)
             rate = rate.subtract(BigDecimal.valueOf(3));
         if (applicant.maritalStatus() == MaritalStatus.DIVORCED)
             rate = rate.add(BigDecimal.ONE);
+
         //gender
         if (applicant.gender() == Gender.FEMALE && age >= 32 && age <= 60)
             rate = rate.subtract(BigDecimal.valueOf(3));
@@ -148,26 +168,39 @@ public class CalculatorService {
         if (applicant.gender() == Gender.NON_BINARY)
             rate = rate.add(BigDecimal.valueOf(7));
 
+        log.debug("ПРОМЕЖУТОЧНЫЙ ШАГ: Итоговая ставка после всех модификаторов = {}", rate);
         return rate;
     }
+
     private void performScoring(ScoringDataDto applicant) {
         int age = Period.between(applicant.birthdate(), LocalDate.now()).getYears();
         EmploymentDto employer = applicant.employment();
 
         //REJECTS
-        if (employer.employmentStatus() == EmploymentStatus.UNEMPLOYED)
+        if (employer.employmentStatus() == EmploymentStatus.UNEMPLOYED) {
+            log.info("Отказ по скорингу: статус 'Безработный'");
             throw new ScoringException(ScoringError.UNEMPLOYED);
-        if (applicant.amount().compareTo(employer.salary().multiply(BigDecimal.valueOf(24))) > 0)
+        }
+        if (applicant.amount().compareTo(employer.salary().multiply(BigDecimal.valueOf(24))) > 0) {
+            log.info("Отказ по скорингу: запрашиваемая сумма превышает 24 оклада");
             throw new ScoringException(ScoringError.LOW_SALARY);
-        if (age < 20 || age > 65)
+        }
+        if (age < 20 || age > 65) {
+            log.info("Отказ по скорингу: неподходящий возраст ({})", age);
             throw new ScoringException(ScoringError.BAD_AGE);
-        if (employer.workExperienceTotal() < 18)
+        }
+        if (employer.workExperienceTotal() < 18) {
+            log.info("Отказ по скорингу: недостаточный общий стаж работы ({})", employer.workExperienceTotal());
             throw new ScoringException(ScoringError.LOW_TOTAL_EXP);
-        if (employer.workExperienceCurrent() < 3)
+        }
+        if (employer.workExperienceCurrent() < 3) {
+            log.info("Отказ по скорингу: недостаточный текущий стаж работы ({})", employer.workExperienceCurrent());
             throw new ScoringException(ScoringError.LOW_CURRENT_EXP);
+        }
     }
+
     private BigDecimal calculatePsk(int term, BigDecimal rate) {
-        System.out.println();
+        log.debug("ПРОМЕЖУТОЧНЫЙ ШАГ: Расчет ПСК для ставки={} и срока={}", rate, term);
         BigDecimal monthlyRate = rate.divide(
                 BigDecimal.valueOf(MONTHS_IN_YEAR * PERCENT_DIVISOR),
                 SCALE_INTERMEDIATE,
@@ -179,12 +212,14 @@ public class CalculatorService {
 
         return psk.setScale(SCALE_PSK, RoundingMode.HALF_UP);
     }
+
     private List<PaymentScheduleElementDto> calculateSchedulePayment(
             BigDecimal amount,
             Integer term,
             BigDecimal rate,
             BigDecimal monthlyPayment
     ) {
+        log.debug("ПРОМЕЖУТОЧНЫЙ ШАГ: Старт генерации графика платежей на {} месяцев", term);
         List<PaymentScheduleElementDto> schedulePayment = new ArrayList<>(term);
         BigDecimal remainingDebt = amount;
         BigDecimal monthlyRate = rate.divide(
@@ -237,7 +272,7 @@ public class CalculatorService {
             remainingDebt = newRemainingDebt;
         }
 
-        log.debug("Schedule total: paymentSum={}, interestSum={}, debtSum={}, amount={}",
+        log.debug("ПРОМЕЖУТОЧНЫЙ ШАГ: График сформирован. Итог: paymentSum={}, interestSum={}, debtSum={}, amount={}",
                 totalInterest.add(totalDebt), totalInterest, totalDebt, amount);
 
         return schedulePayment;

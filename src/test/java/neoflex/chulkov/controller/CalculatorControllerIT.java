@@ -18,7 +18,12 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWit
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest
+@SpringBootTest(properties = {
+        "calculator.rate=20",
+        "calculator.salary.discount=1",
+        "calculator.insurance.cost-in-percent=0.10",
+        "calculator.insurance.discount=5"
+})
 @AutoConfigureMockMvc(printOnlyOnFailure = false)
 class CalculatorControllerIT {
     @Autowired

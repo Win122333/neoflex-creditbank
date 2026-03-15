@@ -25,13 +25,21 @@ public class CalculatorController {
     public List<LoanOfferDto> getAvailableOffers(
             @Valid @RequestBody LoanStatementRequestDto loanStatementRequestDto
             ) {
-        log.info("called /calculator/offers with loanStatementRequestDto = {}", loanStatementRequestDto);
-        return calculatorService.getAvailableOffers(loanStatementRequestDto);
+        log.info("ВХОДНЫЕ ДАННЫЕ (/offers) Сумма = {}, Срок = {} мес, имя = {}, фамилия = {}",
+                loanStatementRequestDto.amount(), loanStatementRequestDto.term(), loanStatementRequestDto.firstName(),
+                loanStatementRequestDto.lastName());
+        List<LoanOfferDto> response = calculatorService.getAvailableOffers(loanStatementRequestDto);
+        log.info("Ответ: {}", response);
+        return response;
     }
     @PostMapping("/calc")
     public CreditDto calculate(
             @Valid @RequestBody ScoringDataDto scoringDataDto
     ) {
-        return calculatorService.calculateCredit(scoringDataDto);
+        log.info("ВХОДНЫЕ ДАННЫЕ (/calc): Запрос на скоринг. Сумма = {}, Срок = {} мес, Зарплатник = {}",
+                scoringDataDto.amount(), scoringDataDto.term(), scoringDataDto.isSalaryClient());
+        CreditDto response = calculatorService.calculateCredit(scoringDataDto);
+        log.info("ВЫХОДНЫЕ ДАННЫЕ (/calc): Кредит одобрен. {}", response);
+        return response;
     }
 }
