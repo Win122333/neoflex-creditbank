@@ -44,10 +44,7 @@ class CalculatorControllerIT {
                                 "}");
         //when
         ResultActions resultActions = mockMvc.perform(request)
-                .andExpectAll(status().isOk())
-                .andDo(document("calculator/offers"),
-                        preprocessResponse(prettyPrint()),
-
+                .andExpectAll(status().isOk());
 
     }
     @Test

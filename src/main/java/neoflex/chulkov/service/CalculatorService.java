@@ -1,6 +1,8 @@
 package neoflex.chulkov.service;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import neoflex.chulkov.config.CalculatorProperties;
 import neoflex.chulkov.dto.*;
 import neoflex.chulkov.dto.enums.*;
 import neoflex.chulkov.exception.ScoringException;
@@ -17,16 +19,9 @@ import java.util.List;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class CalculatorService {
-    //TODO
-    @Value("${calculator.insurance.costInPercent:0.10}")
-    private Double insuranceCostInPercent;
-    @Value("${calculator.insurance.discount:2}")
-    private BigDecimal insuranceDiscount;
-    @Value("${calculator.salary.discount:1}")
-    private BigDecimal salaryDiscount;
-    @Value("${calculator.rate:20}")
-    private BigDecimal baseRate;
+    private final CalculatorProperties properties;
     private static final int SCALE_INTERMEDIATE = 10;
     private static final int SCALE_MONEY = 2;
     private static final int SCALE_PSK = 4;
@@ -52,12 +47,12 @@ public class CalculatorService {
     ) {
         BigDecimal insuranceCost = calculateInsuranceCost(req.amount(), isInsuranceEnabled);
         BigDecimal totalAmount = req.amount().add(insuranceCost);
-        BigDecimal rate = baseRate;
+        BigDecimal rate = properties.rate();
         if (isInsuranceEnabled) {
-            rate = rate.subtract(insuranceDiscount);
+            rate = rate.subtract(properties.insurance().discount());
         }
         if (isSalaryClient) {
-            rate = rate.subtract(salaryDiscount);
+            rate = rate.subtract(properties.salary().discount());
         }
         BigDecimal monthlyPayment = calculateMonthlyPayment(totalAmount, req.term(), rate);
 
@@ -76,7 +71,7 @@ public class CalculatorService {
         if (!isInsuranceEnabled) {
             return BigDecimal.ZERO;
         }
-        return amount.multiply(BigDecimal.valueOf(insuranceCostInPercent)).setScale(2, RoundingMode.HALF_UP);
+        return amount.multiply(properties.insurance().costInPercent()).setScale(2, RoundingMode.HALF_UP);
     }
     private BigDecimal calculateMonthlyPayment(BigDecimal amount, Integer term, BigDecimal rate) {
         log.debug("Calculating monthly payment: amount={}, term={}, rate={}", amount, term, rate);
@@ -123,13 +118,13 @@ public class CalculatorService {
     }
     private BigDecimal calculateRate(ScoringDataDto applicant) {
         int age = Period.between(applicant.birthdate(), LocalDate.now()).getYears();
-        BigDecimal rate = baseRate;
+        BigDecimal rate = properties.rate();
         EmploymentDto employer = applicant.employment();
 
         if (applicant.isInsuranceEnabled())
-            rate = rate.subtract(insuranceDiscount);
+            rate = rate.subtract(properties.insurance().discount());
         if (applicant.isSalaryClient())
-            rate = rate.subtract(salaryDiscount);
+            rate = rate.subtract(properties.salary().discount());
         //employment status
         if (employer.employmentStatus() == EmploymentStatus.SELF_EMPLOYED)
             rate = rate.add(BigDecimal.valueOf(2));

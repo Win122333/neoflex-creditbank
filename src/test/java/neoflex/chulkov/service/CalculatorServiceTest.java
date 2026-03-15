@@ -1,6 +1,7 @@
 package neoflex.chulkov.service;
 
 import lombok.extern.slf4j.Slf4j;
+import neoflex.chulkov.config.CalculatorProperties;
 import neoflex.chulkov.dto.*;
 import neoflex.chulkov.dto.enums.*;
 import neoflex.chulkov.exception.ScoringException;
@@ -24,11 +25,19 @@ class CalculatorServiceTest {
     private CalculatorService service;
     @BeforeEach
     void setUp() {
-        service = new CalculatorService();
-        ReflectionTestUtils.setField(service, "baseRate", BigDecimal.valueOf(20));
-        ReflectionTestUtils.setField(service, "salaryDiscount", BigDecimal.valueOf(1));
-        ReflectionTestUtils.setField(service, "insuranceDiscount", BigDecimal.valueOf(5));
-        ReflectionTestUtils.setField(service, "insuranceCostInPercent", 0.10);
+        CalculatorProperties.Salary salaryProps = new CalculatorProperties.Salary(
+                BigDecimal.valueOf(1)
+        );
+        CalculatorProperties.Insurance insuranceProps = new CalculatorProperties.Insurance(
+                new BigDecimal("0.10"),
+                BigDecimal.valueOf(5)
+        );
+        CalculatorProperties properties = new CalculatorProperties(
+                BigDecimal.valueOf(20),
+                insuranceProps,
+                salaryProps
+        );
+        service = new CalculatorService(properties);
     }
     @Test
     void getOffers_shouldReturn4SortedOffers() {
