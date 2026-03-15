@@ -5,6 +5,8 @@ calculator:
     discount: 5
   salary:
     discount: 1
-
+springdoc:
+  swagger-ui:
+    url: /openapi.json
 server:
   port: 8081

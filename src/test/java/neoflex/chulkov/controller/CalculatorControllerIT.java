@@ -7,9 +7,15 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -37,11 +43,15 @@ class CalculatorControllerIT {
                                 "  \"passportNumber\": \"567890\"\n" +
                                 "}");
         //when
-        mockMvc.perform(request)
-                .andExpectAll(status().isOk());
+        ResultActions resultActions = mockMvc.perform(request)
+                .andExpectAll(status().isOk())
+                .andDo(document("calculator/offers"),
+                        preprocessResponse(prettyPrint()),
+
+
     }
     @Test
-    @DisplayName("Возвращает CreditDto, если проходит scoring")
+    @DisplayName("Возвращает CreditDto")
     void calculateCredit_ReturnCreditDto_WhereDataIsValid() throws Exception {
         //given
         var request = MockMvcRequestBuilders
@@ -78,8 +88,8 @@ class CalculatorControllerIT {
                 .andExpectAll(status().isOk());
     }
     @Test
-    @DisplayName("Возвращает CreditDto, если проходит scoring")
-    void calculateCredit_ThrowScoringException_WhereDataIsInvalid() throws Exception {
+    @DisplayName("Данные не проходят скоринг")
+    void calculateCredit_ThrowScoringException_WhereDataBadForScoring() throws Exception {
         //given
         var request = MockMvcRequestBuilders
                 .post("/calculator/calc")
@@ -88,6 +98,43 @@ class CalculatorControllerIT {
                         "  \"amount\": 1000000,\n" +
                         "  \"term\": 24,\n" +
                         "  \"firstName\": \"Ivan\",\n" +
+                        "  \"lastName\": \"Petrov\",\n" +
+                        "  \"middleName\": \"Sergeevich\",\n" +
+                        "  \"gender\": \"MALE\",\n" +
+                        "  \"birthdate\": \"1990-05-15\",\n" +
+                        "  \"passportSeries\": \"1234\",\n" +
+                        "  \"passportNumber\": \"567890\",\n" +
+                        "  \"passportIssueDate\": \"2010-06-20\",\n" +
+                        "  \"passportIssueBranch\": \"УФМС России по г. Москва\",\n" +
+                        "  \"maritalStatus\": \"MARRIED\",\n" +
+                        "  \"dependentAmount\": 2,\n" +
+                        "  \"employment\": {\n" +
+                        "    \"employmentStatus\": \"UNEMPLOYED\",\n" +
+                        "    \"employerINN\": \"770012345678\",\n" +
+                        "    \"salary\": 150000,\n" +
+                        "    \"position\": \"SPECIALIST\",\n" +
+                        "    \"workExperienceTotal\": 60,\n" +
+                        "    \"workExperienceCurrent\": 24\n" +
+                        "  },\n" +
+                        "  \"accountNumber\": \"40817810000000000001\",\n" +
+                        "  \"isInsuranceEnabled\": true,\n" +
+                        "  \"isSalaryClient\": true\n" +
+                        "}");
+
+        mockMvc.perform(request)
+                .andExpect(status().is(422));
+    }
+    @Test
+    @DisplayName("Данные не проходят валидацию")
+    void calculateCredit_ThrowScoringException_WhereDataIsNotValidating() throws Exception {
+        //given
+        var request = MockMvcRequestBuilders
+                .post("/calculator/calc")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\n" +
+                        "  \"amount\": 1000000,\n" +
+                        "  \"term\": 24,\n" +
+                        "  \"firstName\": \"I\",\n" +
                         "  \"lastName\": \"Petrov\",\n" +
                         "  \"middleName\": \"Sergeevich\",\n" +
                         "  \"gender\": \"MALE\",\n" +
@@ -112,6 +159,6 @@ class CalculatorControllerIT {
                         "}");
 
         mockMvc.perform(request)
-                .andExpect(status().isOk());
+                .andExpect(status().is(400));
     }
 }

@@ -20,6 +20,7 @@ import java.util.List;
 @RequestMapping("/calculator")
 public class CalculatorController {
     private final CalculatorService calculatorService;
+
     @PostMapping("/offers")
     public List<LoanOfferDto> getAvailableOffers(
             @Valid @RequestBody LoanStatementRequestDto loanStatementRequestDto
