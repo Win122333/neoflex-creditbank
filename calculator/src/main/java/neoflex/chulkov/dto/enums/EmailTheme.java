@@ -1,0 +1,11 @@
+package neoflex.chulkov.dto.enums;
+
+public enum EmailTheme {
+    APPLICATION_CREATED,
+    PREAPPROVAL_OFFER,
+    APPROVAL_CONFIRMATION,
+    REJECTION_CONFIRMATION,
+    DOCUMENTS_READY,
+    SIGNATURE_CODE,
+    CREDIT_ISSUED
+}
