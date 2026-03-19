@@ -1,0 +1,483 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "API Микросервиса calculator",
+    "description": "Микросервис для прескоринга, полного скоринга и расчета параметров кредита.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8081",
+      "description": "Локальный сервер разработки"
+    }
+  ],
+  "paths": {
+    "/calculator/offers": {
+      "post": {
+        "summary": "Расчет возможных условий кредита (Прескоринг)",
+        "description": "Осуществляет предварительный расчет 4-х кредитных предложений на основе входных данных заявки. Возвращаемый список отсортирован по убыванию процентной ставки.",
+        "operationId": "getAvailableOffers",
+        "requestBody": {
+          "description": "Первоначальная информация о клиенте и параметрах кредита",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoanStatementRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Успешный результат получения предложений вариантов кредита",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/LoanOfferDto"
+                  }
+                },
+                "example": [
+                  {
+                    "statementId": null,
+                    "requestedAmount": 100000,
+                    "totalAmount": 100000,
+                    "term": 12,
+                    "monthlyPayment": 9263.45,
+                    "rate": 20,
+                    "isInsuranceEnabled": false,
+                    "isSalaryClient": false
+                  },
+                  {
+                    "statementId": null,
+                    "requestedAmount": 100000,
+                    "totalAmount": 100000,
+                    "term": 12,
+                    "monthlyPayment": 9215.66,
+                    "rate": 19,
+                    "isInsuranceEnabled": false,
+                    "isSalaryClient": true
+                  },
+                  {
+                    "statementId": null,
+                    "requestedAmount": 100000,
+                    "totalAmount": 110000,
+                    "term": 12,
+                    "monthlyPayment": 9928.41,
+                    "rate": 15,
+                    "isInsuranceEnabled": true,
+                    "isSalaryClient": false
+                  },
+                  {
+                    "statementId": null,
+                    "requestedAmount": 100000,
+                    "totalAmount": 110000,
+                    "term": 12,
+                    "monthlyPayment": 9876.58,
+                    "rate": 14,
+                    "isInsuranceEnabled": true,
+                    "isSalaryClient": true
+                  }
+                ]
+              }
+            }
+          },
+          "400": {
+            "description": "Ошибка валидации входных данных",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/calculator/calc": {
+      "post": {
+        "summary": "Полный расчет параметров кредита (Скоринг)",
+        "description": "Осуществляет полную проверку клиента по правилам скоринга. При успешном прохождении рассчитывает итоговую ставку, ПСК и формирует детальный график платежей.",
+        "operationId": "calculateCredit",
+        "requestBody": {
+          "description": "Полные данные клиента, включая информацию о работе и паспорте",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ScoringDataDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Кредит одобрен, параметры и график платежей успешно рассчитаны",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreditDto"
+                },
+                "example": {
+                  "amount": 110000,
+                  "term": 12,
+                  "monthlyPayment": 9568.73,
+                  "rate": 8,
+                  "psk": 8,
+                  "isInsuranceEnabled": true,
+                  "isSalaryClient": true,
+                  "paymentSchedule": [
+                    {
+                      "number": 1,
+                      "date": "2026-04-15",
+                      "totalPayment": 9568.73,
+                      "interestPayment": 733.33,
+                      "debtPayment": 8835.4,
+                      "remainingDebt": 110000
+                    },
+                    {
+                      "number": 2,
+                      "date": "2026-05-15",
+                      "totalPayment": 9568.73,
+                      "interestPayment": 674.43,
+                      "debtPayment": 8894.3,
+                      "remainingDebt": 101164.6
+                    },
+                    {
+                      "number": 3,
+                      "date": "2026-06-15",
+                      "totalPayment": 9568.73,
+                      "interestPayment": 615.14,
+                      "debtPayment": 8953.59,
+                      "remainingDebt": 92270.3
+                    },
+                    {
+                      "number": 4,
+                      "date": "2026-07-15",
+                      "totalPayment": 9568.73,
+                      "interestPayment": 555.44,
+                      "debtPayment": 9013.29,
+                      "remainingDebt": 83316.71
+                    },
+                    {
+                      "number": 5,
+                      "date": "2026-08-15",
+                      "totalPayment": 9568.73,
+                      "interestPayment": 495.36,
+                      "debtPayment": 9073.37,
+                      "remainingDebt": 74303.42
+                    },
+                    {
+                      "number": 6,
+                      "date": "2026-09-15",
+                      "totalPayment": 9568.73,
+                      "interestPayment": 434.87,
+                      "debtPayment": 9133.86,
+                      "remainingDebt": 65230.05
+                    },
+                    {
+                      "number": 7,
+                      "date": "2026-10-15",
+                      "totalPayment": 9568.73,
+                      "interestPayment": 373.97,
+                      "debtPayment": 9194.76,
+                      "remainingDebt": 56096.19
+                    },
+                    {
+                      "number": 8,
+                      "date": "2026-11-15",
+                      "totalPayment": 9568.73,
+                      "interestPayment": 312.68,
+                      "debtPayment": 9256.05,
+                      "remainingDebt": 46901.43
+                    },
+                    {
+                      "number": 9,
+                      "date": "2026-12-15",
+                      "totalPayment": 9568.73,
+                      "interestPayment": 250.97,
+                      "debtPayment": 9317.76,
+                      "remainingDebt": 37645.38
+                    },
+                    {
+                      "number": 10,
+                      "date": "2027-01-15",
+                      "totalPayment": 9568.73,
+                      "interestPayment": 188.85,
+                      "debtPayment": 9379.88,
+                      "remainingDebt": 28327.62
+                    },
+                    {
+                      "number": 11,
+                      "date": "2027-02-15",
+                      "totalPayment": 9568.73,
+                      "interestPayment": 126.32,
+                      "debtPayment": 9442.41,
+                      "remainingDebt": 18947.74
+                    },
+                    {
+                      "number": 12,
+                      "date": "2027-03-15",
+                      "totalPayment": 9568.7,
+                      "interestPayment": 63.37,
+                      "debtPayment": 9505.33,
+                      "remainingDebt": 9505.33
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ошибка валидации входных данных",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Отказ по правилам скоринга (например, недостаточный возраст или стаж)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "LoanStatementRequestDto": {
+        "type": "object",
+        "required": [
+          "amount",
+          "term",
+          "firstName",
+          "lastName",
+          "email",
+          "birthday",
+          "passportSeries",
+          "passportNumber"
+        ],
+        "properties": {
+          "amount": {
+            "type": "number",
+            "minimum": 20000,
+            "description": "Запрашиваемая сумма кредита",
+            "example": 100000
+          },
+          "term": {
+            "type": "integer",
+            "minimum": 6,
+            "description": "Срок кредита в месяцах",
+            "example": 12
+          },
+          "firstName": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 30,
+            "description": "Имя клиента",
+            "example": "Ivan"
+          },
+          "lastName": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 30,
+            "description": "Фамилия клиента",
+            "example": "Ivanov"
+          },
+          "middleName": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 30,
+            "description": "Отчество клиента (при наличии)",
+            "example": "Ivanovich"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "description": "Электронная почта",
+            "example": "ivan@example.com"
+          },
+          "birthday": {
+            "type": "string",
+            "format": "date",
+            "description": "Дата рождения",
+            "example": "1990-01-01"
+          },
+          "passportSeries": {
+            "type": "string",
+            "pattern": "^\\d{4}$",
+            "description": "Серия паспорта",
+            "example": "1234"
+          },
+          "passportNumber": {
+            "type": "string",
+            "pattern": "^\\d{6}$",
+            "description": "Номер паспорта",
+            "example": "123456"
+          }
+        }
+      },
+      "LoanOfferDto": {
+        "type": "object",
+        "properties": {
+          "statementId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Идентификатор заявки (возвращается null на этапе калькулятора)",
+            "nullable": true
+          },
+          "requestedAmount": {
+            "type": "number",
+            "description": "Запрошенная сумма кредита",
+            "example": 100000
+          },
+          "totalAmount": {
+            "type": "number",
+            "description": "Итоговая сумма кредита (с учетом страховки)",
+            "example": 110000
+          },
+          "term": {
+            "type": "integer",
+            "description": "Срок кредита в месяцах",
+            "example": 12
+          },
+          "monthlyPayment": {
+            "type": "number",
+            "description": "Ежемесячный аннуитетный платеж",
+            "example": 9750.50
+          },
+          "rate": {
+            "type": "number",
+            "description": "Итоговая процентная ставка",
+            "example": 11.0
+          },
+          "isInsuranceEnabled": {
+            "type": "boolean",
+            "description": "Включена ли страховка",
+            "example": true
+          },
+          "isSalaryClient": {
+            "type": "boolean",
+            "description": "Является ли клиент зарплатным",
+            "example": true
+          }
+        }
+      },
+      "ScoringDataDto": {
+        "type": "object",
+        "required": [
+          "amount",
+          "term",
+          "firstName",
+          "lastName",
+          "gender",
+          "birthdate",
+          "passportSeries",
+          "passportNumber",
+          "passportIssueDate",
+          "passportIssueBranch",
+          "maritalStatus",
+          "dependentAmount",
+          "employment",
+          "accountNumber",
+          "isInsuranceEnabled",
+          "isSalaryClient"
+        ],
+        "properties": {
+          "amount": { "type": "number", "example": 100000 },
+          "term": { "type": "integer", "example": 12 },
+          "firstName": { "type": "string", "example": "Ivan" },
+          "lastName": { "type": "string", "example": "Ivanov" },
+          "middleName": { "type": "string", "example": "Ivanovich" },
+          "gender": { "$ref": "#/components/schemas/Gender" },
+          "birthdate": { "type": "string", "format": "date", "example": "1990-01-01" },
+          "passportSeries": { "type": "string", "example": "1234" },
+          "passportNumber": { "type": "string", "example": "123456" },
+          "passportIssueDate": { "type": "string", "format": "date", "example": "2010-05-15" },
+          "passportIssueBranch": { "type": "string", "example": "ОВД г. Москвы" },
+          "maritalStatus": { "$ref": "#/components/schemas/MaritalStatus" },
+          "dependentAmount": { "type": "integer", "example": 0 },
+          "employment": { "$ref": "#/components/schemas/EmploymentDto" },
+          "accountNumber": { "type": "string", "example": "40817810099910004312" },
+          "isInsuranceEnabled": { "type": "boolean", "example": true },
+          "isSalaryClient": { "type": "boolean", "example": true }
+        }
+      },
+      "EmploymentDto": {
+        "type": "object",
+        "properties": {
+          "employmentStatus": { "$ref": "#/components/schemas/EmploymentStatus" },
+          "employerINN": { "type": "string", "example": "772816897112" },
+          "salary": { "type": "number", "example": 100000 },
+          "position": { "$ref": "#/components/schemas/Position" },
+          "workExperienceTotal": { "type": "integer", "example": 60 },
+          "workExperienceCurrent": { "type": "integer", "example": 24 }
+        }
+      },
+      "CreditDto": {
+        "type": "object",
+        "properties": {
+          "amount": { "type": "number", "example": 110000 },
+          "term": { "type": "integer", "example": 12 },
+          "monthlyPayment": { "type": "number", "example": 9750.50 },
+          "rate": { "type": "number", "example": 11.0 },
+          "psk": { "type": "number", "example": 11.55 },
+          "isInsuranceEnabled": { "type": "boolean", "example": true },
+          "isSalaryClient": { "type": "boolean", "example": true },
+          "paymentSchedule": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/PaymentScheduleElementDto" }
+          }
+        }
+      },
+      "PaymentScheduleElementDto": {
+        "type": "object",
+        "properties": {
+          "number": { "type": "integer", "example": 1 },
+          "date": { "type": "string", "format": "date", "example": "2023-11-27" },
+          "totalPayment": { "type": "number", "example": 9750.50 },
+          "interestPayment": { "type": "number", "example": 1008.33 },
+          "debtPayment": { "type": "number", "example": 8742.17 },
+          "remainingDebt": { "type": "number", "example": 101257.83 }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "timestamp": { "type": "string", "format": "date-time" },
+          "status": { "type": "integer", "example": 400 },
+          "error": { "type": "string", "example": "Validation Failed" },
+          "message": { "type": "string", "example": "amount: Сумма кредита должна быть больше или равна 20000;" }
+        }
+      },
+      "Gender": {
+        "type": "string",
+        "enum": ["MALE", "FEMALE", "NON_BINARY"]
+      },
+      "MaritalStatus": {
+        "type": "string",
+        "enum": ["MARRIED", "DIVORCED", "SINGLE", "WIDOW_WIDOWER"]
+      },
+      "EmploymentStatus": {
+        "type": "string",
+        "enum": ["UNEMPLOYED", "SELF_EMPLOYED", "EMPLOYED", "BUSINESS_OWNER"]
+      },
+      "Position": {
+        "type": "string",
+        "enum": ["WORKER", "MID_MANAGER", "TOP_MANAGER", "OWNER"]
+      }
+    }
+  }
+}
