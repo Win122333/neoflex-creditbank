@@ -1,20 +1,20 @@
 package neoflex.chulkov.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import neoflex.chulkov.dto.PaymentScheduleElementDto;
 import neoflex.chulkov.dto.enums.CreditStatus;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.UUID;
 
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
+@Getter
+@Setter
 @Entity
 @Table(name = "credit")
 public class Credit {
@@ -40,10 +40,10 @@ public class Credit {
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "payment_schedule", columnDefinition = "jsonb")
-    private PaymentScheduleElementDto paymentSchedule;
+    private List<PaymentScheduleElementDto> paymentSchedule;
 
     @Column(name = "insurance_enabled")
-    private Boolean isnuranceEnabled;
+    private Boolean insuranceEnabled;
 
     @Column(name = "salary_client")
     private Boolean salaryClient;

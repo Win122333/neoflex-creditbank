@@ -20,17 +20,17 @@ public class DealController {
 
     @PostMapping("/statement")
     public List<LoanOfferDto> statement(LoanStatementRequestDto dto) {
-        return dealService.statement(dto);
+        return dealService.createStatement(dto);
     }
     @PostMapping("/offer/select")
     public void select(LoanOfferDto dto) {
-        dealService.select(dto);
+        dealService.selectOffer(dto);
     }
     @PostMapping("/calculate/{statementId}")
     public void calculate(
             FinishRegistrationRequestDto dto,
             @RequestParam String statementId
     ) {
-
+        dealService.calculateCredit(dto, statementId);
     }
 }

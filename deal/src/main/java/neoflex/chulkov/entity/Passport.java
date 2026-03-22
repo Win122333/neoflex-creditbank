@@ -9,6 +9,7 @@ import java.util.UUID;
 public record Passport(
         UUID passportUUID,
         String series,
+        String number,
         String issueBranch,
         LocalDateTime issueDate
 ) {
