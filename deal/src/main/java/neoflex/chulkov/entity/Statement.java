@@ -5,12 +5,15 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
+import neoflex.chulkov.dto.LoanOfferDto;
 import neoflex.chulkov.dto.StatementStatusHistoryDto;
 import neoflex.chulkov.dto.enums.ApplicationStatus;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -39,7 +42,7 @@ public class Statement {
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "status_history", columnDefinition = "jsonb")
-    private StatementStatusHistoryDto statusHistory;
+    private List<StatementStatusHistoryDto> statusHistory = new ArrayList<>();
 
     @OneToOne
     @JoinColumn(name = "client_id", referencedColumnName = "client_id")
@@ -49,7 +52,7 @@ public class Statement {
     @JoinColumn(name = "credit_id", referencedColumnName = "credit_id")
     private Credit credit;
 
-    //TODO applied offer
-
-
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "applied_offer", columnDefinition = "jsonb")
+    private LoanOfferDto appliedOffer;
 }

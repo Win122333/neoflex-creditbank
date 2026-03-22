@@ -11,6 +11,6 @@ public class ClientService {
     private final ClientRepository clientRepository;
 
     public Client save(Client entityToSave) {
-        clientRepository.save(entityToSave);
+        return clientRepository.save(entityToSave);
     }
 }

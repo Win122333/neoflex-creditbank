@@ -24,7 +24,7 @@ public class DealController {
     }
     @PostMapping("/offer/select")
     public void select(LoanOfferDto dto) {
-
+        dealService.select(dto);
     }
     @PostMapping("/calculate/{statementId}")
     public void calculate(

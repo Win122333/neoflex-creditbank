@@ -4,13 +4,15 @@ import lombok.RequiredArgsConstructor;
 import neoflex.chulkov.client.LoanOfferRestClient;
 import neoflex.chulkov.dto.LoanOfferDto;
 import neoflex.chulkov.dto.LoanStatementRequestDto;
+import neoflex.chulkov.dto.StatementStatusHistoryDto;
+import neoflex.chulkov.dto.enums.ApplicationStatus;
+import neoflex.chulkov.dto.enums.ChangeType;
 import neoflex.chulkov.entity.Client;
 import neoflex.chulkov.entity.Passport;
 import neoflex.chulkov.entity.Statement;
-import neoflex.chulkov.repository.ClientRepository;
-import neoflex.chulkov.repository.StatementRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -32,8 +34,10 @@ public class DealService {
                         .series(dto.passportSeries())
                         .build());
         clientService.save(client);
-        Statement statement = new Statement();
-        statement.setClient(client);
+        Statement statement = new Statement()
+                .setClient(client)
+                .setStatus(ApplicationStatus.PREAPPROVAL);
+
         Statement savedStatement = statementService.save(statement);
 
         return loanOfferRestClient.getAvailableOffers(dto)
@@ -46,8 +50,21 @@ public class DealService {
                         offer.monthlyPayment(),
                         offer.rate(),
                         offer.isInsuranceEnabled(),
-                        offer.isSalaryClient()
-                        ))
+                        offer.isSalaryClient()))
                 .toList();
+    }
+
+    public void select(LoanOfferDto dto) {
+        Statement statement = statementService.getStatementById(dto.statementId());
+        statement
+                .setStatus(ApplicationStatus.APPROVED)
+                .setAppliedOffer(dto);
+        statement.getStatusHistory().add(
+                new StatementStatusHistoryDto(
+                        ApplicationStatus.APPROVED,
+                        LocalDateTime.now(),
+                        ChangeType.AUTOMATIC
+        ));
+        statementService.save(statement);
     }
 }
