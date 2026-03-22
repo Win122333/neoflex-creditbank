@@ -1,0 +1,19 @@
+package neoflex.chulkov.config;
+
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.client.RestClient;
+
+@Configuration
+public class Beans {
+    @Bean
+    public RestClient getRestClient(
+            @Value("${deal.calculator-base-url:http://localhost:8081}") String baseUrl
+    ) {
+        return RestClient.builder()
+                .baseUrl(baseUrl)
+                .build();
+    }
+}

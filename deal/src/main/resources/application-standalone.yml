@@ -1,0 +1,12 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/deal
+    username: user
+    password: pass
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+
+deal:
+  calculator-base-url: http://localhost:8081
