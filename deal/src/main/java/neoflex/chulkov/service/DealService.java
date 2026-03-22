@@ -1,6 +1,7 @@
 package neoflex.chulkov.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import neoflex.chulkov.client.CalculatorRestClient;
 import neoflex.chulkov.dto.*;
 import neoflex.chulkov.dto.enums.ApplicationStatus;
@@ -8,8 +9,8 @@ import neoflex.chulkov.dto.enums.ChangeType;
 import neoflex.chulkov.dto.enums.CreditStatus;
 import neoflex.chulkov.entity.Client;
 import neoflex.chulkov.entity.Credit;
-import neoflex.chulkov.entity.Passport;
 import neoflex.chulkov.entity.Statement;
+import neoflex.chulkov.mapper.ClientMapper;
 import neoflex.chulkov.mapper.CreditMapper;
 import neoflex.chulkov.mapper.ScoringDataMapper;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class DealService {
@@ -29,26 +31,14 @@ public class DealService {
     private final CreditMapper creditMapper;
 
     public List<LoanOfferDto> createStatement(LoanStatementRequestDto dto) {
-        Client client = new Client()
-                .setEmail(dto.email())
-                .setFirstName(dto.firstName())
-                .setLastName(dto.lastName())
-                .setBirthDate(dto.birthday())
-                .setMiddleName(dto.middleName())
-                .setPassport(Passport.builder()
-                        .series(dto.passportSeries())
-                        .build());
-        clientService.save(client);
-        Statement statement = new Statement()
-                .setClient(client)
-                .setStatus(ApplicationStatus.PREAPPROVAL);
+        Client client = clientService.createClient(dto);
+        Statement statement = statementService.createStatement(client);
 
-        Statement savedStatement = statementService.save(statement);
-
+        log.debug("save statement and client");
         return calculatorRestClient.getAvailableOffers(dto)
                 .stream()
                 .map(offer -> new LoanOfferDto(
-                        savedStatement.getStatement_id(),
+                        statement.getStatement_id(),
                         offer.requestedAmount(),
                         offer.totalAmount(),
                         offer.term(),
@@ -70,13 +60,14 @@ public class DealService {
                         LocalDateTime.now(),
                         ChangeType.AUTOMATIC
         ));
-        statementService.save(statement);
+        statementService.saveStatement(statement);
     }
 
     public void calculateCredit(FinishRegistrationRequestDto dto, String statementId) {
         Statement statement = statementService.getStatementById(UUID.fromString(statementId));
-
+        //TODO насыщать Client
         ScoringDataDto scoringData = scoringDataMapper.toScoringDataDto(statement, dto);
+        log.debug("calculateCredit with scoringData = {}", scoringData);
         try{
             CreditDto creditDto = calculatorRestClient.getCredit(scoringData);
             Credit creditEntity = creditMapper.toCredit(creditDto);
@@ -92,11 +83,11 @@ public class DealService {
                             ChangeType.AUTOMATIC
                     )
             );
-            statementService.save(statement);
+            statementService.saveStatement(statement);
         }
         catch (RuntimeException e) {//TODO сделать красиво
             statement.setStatus(ApplicationStatus.CC_DENIED);
-            statementService.save(statement);
+            statementService.saveStatement(statement);
         }
     }
 }

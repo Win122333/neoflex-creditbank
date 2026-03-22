@@ -4,7 +4,17 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="8bb68439-b45d-448d-a677-68c16fb00eaa" name="Changes" comment="" />
+    <list default="true" id="8bb68439-b45d-448d-a677-68c16fb00eaa" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/../deal/src/main/java/neoflex/chulkov/mapper/ClientMapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../deal/.idea/encodings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../deal/.idea/encodings.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../deal/src/main/java/neoflex/chulkov/controller/DealController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../deal/src/main/java/neoflex/chulkov/controller/DealController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../deal/src/main/java/neoflex/chulkov/service/ClientService.java" beforeDir="false" afterPath="$PROJECT_DIR$/../deal/src/main/java/neoflex/chulkov/service/ClientService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../deal/src/main/java/neoflex/chulkov/service/DealService.java" beforeDir="false" afterPath="$PROJECT_DIR$/../deal/src/main/java/neoflex/chulkov/service/DealService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../deal/src/main/java/neoflex/chulkov/service/StatementService.java" beforeDir="false" afterPath="$PROJECT_DIR$/../deal/src/main/java/neoflex/chulkov/service/StatementService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../deal/src/main/resources/application-standalone.yml" beforeDir="false" afterPath="$PROJECT_DIR$/../deal/src/main/resources/application-standalone.yml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -13,21 +23,21 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
   </component>
-  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
-  "lastFilter": {
-    "state": "OPEN",
-    "assignee": "Win122333"
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;Win122333&quot;
   }
-}]]></component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/Win122333/neoflex-creditbank",
-    "accountId": "e43c0c4d-6657-409c-92ad-592977529bee"
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/Win122333/neoflex-creditbank&quot;,
+    &quot;accountId&quot;: &quot;e43c0c4d-6657-409c-92ad-592977529bee&quot;
   }
-}]]></component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 8
-}]]></component>
+}</component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 8
+}</component>
   <component name="ProjectId" id="3BI548SRz9fQjb6iiwJmrDOUJY2" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -36,9 +46,14 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RequestMappingsPanelOrder0": "0",
+    "RequestMappingsPanelOrder1": "1",
+    "RequestMappingsPanelWidth0": "75",
+    "RequestMappingsPanelWidth1": "75",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "Spring Boot.CalculatorApplication.executor": "Run",
     "git-widget-placeholder": "feature/MVP-2",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "C:/Users/artem/IdeaProjects/neoflex-creditbank/calculator",
@@ -48,6 +63,7 @@
 }]]></component>
   <component name="RunManager">
     <configuration name="CalculatorApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <option name="ACTIVE_PROFILES" value="standalone" />
       <module name="calculator" />
       <option name="SPRING_BOOT_MAIN_CLASS" value="neoflex.chulkov.CalculatorApplication" />
       <method v="2">
@@ -71,6 +87,7 @@
       <option name="presentableId" value="Default" />
       <updated>1774163549725</updated>
       <workItem from="1774163550847" duration="161000" />
+      <workItem from="1774187731306" duration="3996000" />
     </task>
     <servers />
   </component>
