@@ -32,7 +32,6 @@ public class DealService {
     private final CreditService creditService;
     private final ScoringDataMapper scoringDataMapper;
     private final CreditMapper creditMapper;
-    private final ClientMapper clientMapper;
 
     @Transactional
     public List<LoanOfferDto> createStatement(LoanStatementRequestDto dto) {
