@@ -1,5 +1,6 @@
 package neoflex.chulkov.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import neoflex.chulkov.dto.FinishRegistrationRequestDto;
@@ -21,10 +22,10 @@ public class DealController {
 
     @PostMapping("/statement")
     public ResponseEntity<List<LoanOfferDto>> statement(
-            @RequestBody LoanStatementRequestDto dto
+            @RequestBody @Valid LoanStatementRequestDto dto
     ) {
         log.info("called /statement with dto = {}", dto);
-        return ResponseEntity.ok(dealService.createStatement(dto));
+        return ResponseEntity.status(HttpStatus.CREATED).body(dealService.createStatement(dto));
     }
     @PostMapping("/offer/select")
     public ResponseEntity<Void> select(
@@ -35,11 +36,12 @@ public class DealController {
         return ResponseEntity.status(HttpStatus.ACCEPTED).build();
     }
     @PostMapping("/calculate/{statementId}")
-    public void calculate(
+    public ResponseEntity<Void> calculate(
             @RequestBody FinishRegistrationRequestDto dto,
             @PathVariable String statementId
     ) {
         log.info("called /calculate/{statementId} with dto = {}", dto);
         dealService.calculateCredit(dto, statementId);
+        return ResponseEntity.status(HttpStatus.ACCEPTED).build();
     }
 }

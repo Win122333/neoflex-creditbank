@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 public class CreditService {
     private final CreditRepository creditRepository;
 
-    public Credit save(Credit entityToSave) {
+    public Credit saveCredit(Credit entityToSave) {
         return creditRepository.save(entityToSave);
     }
 }

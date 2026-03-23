@@ -1,0 +1,11 @@
+spring:
+  datasource:
+    url: jdbc:tc:postgresql:16:///deal?TC_DAEMON
+    username: deal
+    password: deal
+  jpa:
+    hibernate:
+      ddl-auto: create-drop # <-- Заставляет Hibernate создать таблицы перед тестом и удалить после
+    show-sql: true
+deal:
+  calculator-base-url: http://localhost:54321

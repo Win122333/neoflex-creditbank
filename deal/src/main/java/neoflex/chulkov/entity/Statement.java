@@ -24,8 +24,9 @@ import java.util.UUID;
 @Accessors(chain = true)
 public class Statement {
     @Id
+    @Column(name = "statement_id")
     @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID statement_id;
+    private UUID statementId;
 
     @Column(name = "status")
     @Enumerated(EnumType.STRING)

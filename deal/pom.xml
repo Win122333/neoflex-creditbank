@@ -21,6 +21,7 @@
         <lombok-version>1.18.42</lombok-version>
         <springdoc-version>2.6.0</springdoc-version>
         <mapstruct-version>1.6.3</mapstruct-version>
+        <wiremock-version>3.3.1</wiremock-version>
     </properties>
 
     <dependencies>
@@ -76,6 +77,17 @@
             <artifactId>mapstruct</artifactId>
             <version>${mapstruct-version}</version>
             <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>postgresql</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.wiremock</groupId>
+            <artifactId>wiremock-standalone</artifactId>
+            <version>${wiremock-version}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
     <build>

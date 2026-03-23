@@ -28,6 +28,7 @@ public class StatementService {
     }
 
     public Statement saveStatement(Statement entityToSave) {
+        log.debug("saved statement = {}", entityToSave);
         return statementRepository.save(entityToSave);
     }
 
