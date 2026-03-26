@@ -22,6 +22,7 @@
         <springdoc-version>2.6.0</springdoc-version>
         <mapstruct-version>1.6.3</mapstruct-version>
         <wiremock-version>3.3.1</wiremock-version>
+        <openapi-generator-version>7.9.0</openapi-generator-version>
     </properties>
 
     <dependencies>
@@ -99,39 +100,112 @@
             <artifactId>micrometer-registry-prometheus</artifactId>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>org.openapitools</groupId>
+            <artifactId>jackson-databind-nullable</artifactId>
+            <version>0.2.6</version>
+        </dependency>
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <scope>runtime</scope>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
             <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-                <configuration>
-                    <excludes>
-                        <exclude>
-                            <groupId>org.projectlombok</groupId>
-                            <artifactId>lombok</artifactId>
-                        </exclude>
-                        <exclude>
-                            <groupId>org.mapstruct</groupId>
-                            <artifactId>mapstruct-processor</artifactId>
-                            <version>${mapstruct-version}</version>
-                        </exclude>
-                    </excludes>
-                </configuration>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>3.5.0</version>
                 <executions>
                     <execution>
+                        <id>add-source</id>
+                        <phase>generate-sources</phase>
                         <goals>
-                            <goal>repackage</goal>
+                            <goal>add-source</goal>
                         </goals>
+                        <configuration>
+                            <sources>
+                                <source>${project.build.directory}/generated-sources/openapi/src/main/java</source>
+                            </sources>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
             <plugin>
+                <groupId>org.openapitools</groupId>
+                <artifactId>openapi-generator-maven-plugin</artifactId>
+                <version>7.9.0</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <inputSpec>${project.basedir}/src/main/resources/api-docs.yaml</inputSpec>
+                            <generatorName>spring</generatorName>
+                            <apiPackage>neoflex.chulkov.api</apiPackage>
+                            <modelPackage>neoflex.chulkov.dto</modelPackage>
+                            <invokerPackage>neoflex.chulkov</invokerPackage>
+                            <supportingFilesToGenerate>ApiUtil.java</supportingFilesToGenerate>
+                            <configOptions>
+                                <interfaceOnly>false</interfaceOnly>
+                                <delegatePattern>true</delegatePattern>
+                                <useSpringBoot3>true</useSpringBoot3>
+                                <useJakartaEe>true</useJakartaEe>
+                                <serializableModel>true</serializableModel>
+                            </configOptions>
+
+                            <typeMappings>
+                                <typeMapping>ApplicationStatus=neoflex.chulkov.dto.enums.ApplicationStatus</typeMapping>
+                                <typeMapping>ChangeType=neoflex.chulkov.dto.enums.ChangeType</typeMapping>
+                                <typeMapping>Gender=neoflex.chulkov.dto.enums.Gender</typeMapping>
+                                <typeMapping>MaritalStatus=neoflex.chulkov.dto.enums.MaritalStatus</typeMapping>
+                            </typeMappings>
+
+                            <importMappings>
+                                <importMapping>ApplicationStatus=neoflex.chulkov.dto.enums.ApplicationStatus</importMapping>
+                                <importMapping>ChangeType=neoflex.chulkov.dto.enums.ChangeType</importMapping>
+                                <importMapping>Gender=neoflex.chulkov.dto.enums.Gender</importMapping>
+                                <importMapping>MaritalStatus=neoflex.chulkov.dto.enums.MaritalStatus</importMapping>
+                            </importMappings>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.openapitools</groupId>
+                <artifactId>openapi-generator-maven-plugin</artifactId>
+                <version>${openapi-generator-version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <inputSpec>${project.basedir}/src/main/resources/api-docs.yaml</inputSpec>
+                            <generatorName>spring</generatorName>
+                            <apiPackage>neoflex.chulkov.api</apiPackage>
+                            <modelPackage>neoflex.chulkov.dto</modelPackage>
+                            <invokerPackage>neoflex.chulkov</invokerPackage>
+                            <configOptions>
+                                <interfaceOnly>false</interfaceOnly>
+                                <delegatePattern>true</delegatePattern>
+                                <useSpringBoot3>true</useSpringBoot3>
+                                <useJakartaEe>true</useJakartaEe>
+                                <serializableModel>true</serializableModel>
+                            </configOptions>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <source>${maven.compiler.source}</source>
-                    <target>${maven.compiler.target}</target>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
                     <annotationProcessorPaths>
                         <path>
                             <groupId>org.projectlombok</groupId>
@@ -161,19 +235,8 @@
                             <groupId>org.projectlombok</groupId>
                             <artifactId>lombok</artifactId>
                         </exclude>
-                        <exclude>
-                            <groupId>org.mapstruct</groupId>
-                            <artifactId>mapstruct-processor</artifactId>
-                        </exclude>
                     </excludes>
                 </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>repackage</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
     </build>

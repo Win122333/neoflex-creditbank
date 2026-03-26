@@ -32,7 +32,7 @@ class ClientServiceTest {
     @Test
     @DisplayName("Создание клиента: маппер превращает DTO в сущность, а репозиторий ее сохраняет")
     void createClient_ShouldMapAndSaveClient() {
-        LoanStatementRequestDto dto = LoanStatementRequestDto.builder().build();
+        LoanStatementRequestDto dto = new LoanStatementRequestDto();
         Client mappedClient = new Client();
         Client savedClient = new Client();
 
@@ -65,7 +65,7 @@ class ClientServiceTest {
     @DisplayName("Обновление клиента: маппер обновляет поля, репозиторий сохраняет")
     void updateClient_ShouldUpdateViaMapperAndSave() {
         Client existingClient = new Client();
-        FinishRegistrationRequestDto dto = FinishRegistrationRequestDto.builder().build();
+        FinishRegistrationRequestDto dto = new FinishRegistrationRequestDto();
 
         clientService.updateClient(existingClient, dto);
 

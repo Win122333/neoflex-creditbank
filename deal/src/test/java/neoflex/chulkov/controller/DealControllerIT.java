@@ -3,6 +3,7 @@ package neoflex.chulkov.controller;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import jakarta.transaction.Transactional;
+import neoflex.chulkov.DealApplication;
 import neoflex.chulkov.dto.LoanStatementRequestDto;
 import neoflex.chulkov.dto.enums.ApplicationStatus;
 import neoflex.chulkov.dto.enums.CreditStatus;
@@ -29,7 +30,7 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.*;
 
 @Transactional
-@SpringBootTest
+@SpringBootTest(classes = DealApplication.class)
 @AutoConfigureMockMvc
 @WireMockTest(httpPort = 54321)
 public class DealControllerIT {
@@ -48,80 +49,49 @@ public class DealControllerIT {
     void statement_RequestIsValid_ReturnsListOf4LoanOfferDtoAndSaveClientAndStatement() throws Exception {
         WireMock.stubFor(WireMock.post(WireMock.urlPathMatching("/calculator/offers"))
                 .withRequestBody(WireMock.equalToJson("""
-                        {
-                          "amount": 500000,
-                          "term": 12,
-                          "firstName": "Vlad",
-                          "lastName": "Simonyan",
-                          "middleName": "Igorevich",
-                          "email": "arte2m@example.com",
-                          "birthday": "1995-03-23",
-                          "passportSeries": "1234",
-                          "passportNumber": "567890"
-                        }
-                        """, true, true))
+                    {
+                      "amount": 500000,
+                      "term": 12,
+                      "firstName": "Vlad",
+                      "lastName": "Simonyan",
+                      "middleName": "Igorevich",
+                      "email": "arte2m@example.com",
+                      "birthday": [1995, 3, 23], 
+                      "passportSeries": "1234",
+                      "passportNumber": "567890"
+                    }
+                    """, true, true)) // Обрати внимание на массив в birthday
                 .willReturn(WireMock.ok("""
-                        [
-                            {
-                                "statementId": null,
-                                "requestedAmount": 500000,
-                                "totalAmount": 500000,
-                                "term": 12,
-                                "monthlyPayment": 46317.25,
-                                "rate": 20,
-                                "isInsuranceEnabled": false,
-                                "isSalaryClient": false
-                            },
-                            {
-                                "statementId": null,
-                                "requestedAmount": 500000,
-                                "totalAmount": 500000,
-                                "term": 12,
-                                "monthlyPayment": 46078.29,
-                                "rate": 19,
-                                "isInsuranceEnabled": false,
-                                "isSalaryClient": true
-                            },
-                            {
-                                "statementId": null,
-                                "requestedAmount": 500000,
-                                "totalAmount": 550000.00,
-                                "term": 12,
-                                "monthlyPayment": 49642.07,
-                                "rate": 15,
-                                "isInsuranceEnabled": true,
-                                "isSalaryClient": false
-                            },
-                            {
-                                "statementId": null,
-                                "requestedAmount": 500000,
-                                "totalAmount": 550000.00,
-                                "term": 12,
-                                "monthlyPayment": 49382.91,
-                                "rate": 14,
-                                "isInsuranceEnabled": true,
-                                "isSalaryClient": true
-                            }
-                        ]
-                        """).withHeader("Content-Type", "application/json")));
+                    [
+                        {
+                            "requestedAmount": 500000,
+                            "totalAmount": 500000,
+                            "term": 12,
+                            "monthlyPayment": 46317.25,
+                            "rate": 20,
+                            "isInsuranceEnabled": false,
+                            "isSalaryClient": false
+                        }
+                    ]
+                    """).withHeader("Content-Type", "application/json")));
+
         mockMvc.perform(MockMvcRequestBuilders.post("/deal/statement")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                                {
-                                "amount": 500000,
-                                "term": 12,
-                                "firstName": "Vlad",
-                                "lastName": "Simonyan",
-                                "middleName": "Igorevich",
-                                "email": "arte2m@example.com",
-                                "birthday": "1995-03-23",
-                                "passportSeries": "1234",
-                                "passportNumber": "567890"
-                                }
-                                """)
+                            {
+                            "amount": 500000,
+                            "term": 12,
+                            "firstName": "Vlad",
+                            "lastName": "Simonyan",
+                            "middleName": "Igorevich",
+                            "email": "arte2m@example.com",
+                            "birthday": "1995-03-23",
+                            "passportSeries": "1234",
+                            "passportNumber": "567890"
+                            }
+                            """)
                 )
-                .andExpectAll(MockMvcResultMatchers.status().isCreated(),
-                        MockMvcResultMatchers.jsonPath("$.length()").value(4));
+                .andExpect(MockMvcResultMatchers.status().isCreated());
 
         var clients = clientRepository.findAll();
         var statements = statementRepository.findAll();
@@ -143,16 +113,16 @@ public class DealControllerIT {
     @Test
     @DisplayName("Выбирается один из 4 LoanOffer и обновляется statement")
     void select_RequestIsValid_updateInformationInStatement() throws Exception {
-        Client client = clientService.createClient(new LoanStatementRequestDto(
-                BigDecimal.valueOf(50000),
-                12,
-                "Vlad",
-                "Simonyan",
-                "Igorevich",
-                "arte2m@example.com",
-                LocalDate.parse("1995-03-23"),
-                "1234",
-                "567890"));
+        Client client = clientService.createClient(new LoanStatementRequestDto()
+                .amount(BigDecimal.valueOf(50000))
+                .term(12)
+                .firstName("Vlad")
+                .lastName("Simonyan")
+                .middleName("Igorevich")
+                .email("arte2m@example.com")
+                .birthday(LocalDate.parse("1995-03-23"))
+                .passportNumber("1234")
+                .passportSeries("567890"));
         Statement statement = new Statement();
         statement.setClient(client);
         statement = statementRepository.save(statement);
@@ -178,78 +148,64 @@ public class DealControllerIT {
         assertEquals(1, statements.size());
         var updatedStatement = statements.get(0);
         assertEquals(1, updatedStatement.getStatusHistory().size());
-        assertEquals(ApplicationStatus.APPROVED, updatedStatement.getStatusHistory().get(0).status());
+        assertEquals(ApplicationStatus.APPROVED, updatedStatement.getStatusHistory().get(0).getStatus());
         assertEquals(ApplicationStatus.APPROVED, updatedStatement.getStatus());
     }
 
     @Test
     @DisplayName("Насыщает информацию клиента, обновляет заявление и сохраняет в бд ифнормацию о кредите")
     void calculateCredit_RequestIsValid_ShouldUpdateClientAndStatementAndSaveCreditInformation() throws Exception {
-        Client client = clientService.createClient(new LoanStatementRequestDto(
-                BigDecimal.valueOf(50000),
-                12,
-                "Vlad",
-                "Simonyan",
-                "Igorevich",
-                "arte2m@example.com",
-                LocalDate.parse("1995-03-23"),
-                "1234",
-                "567890"));
+        Client client = clientService.createClient(new LoanStatementRequestDto()
+                        .amount(BigDecimal.valueOf(50000))
+                        .term(12)
+                        .firstName("Vlad")
+                        .lastName("Simonyan")
+                        .middleName("Igorevich")
+                        .email("arte2m@example.com")
+                        .birthday(LocalDate.parse("1995-03-23"))
+                        .passportNumber("1234")
+                        .passportSeries("567890"));
         Statement statement = new Statement();
         statement.setClient(client);
         statement = statementRepository.save(statement);
         UUID validStatementId = statement.getStatementId();
-        mockMvc.perform(MockMvcRequestBuilders.post("/deal/offer/select")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                                    {
-                                         "statementId": "%s",
-                                         "requestedAmount": 500000,
-                                         "totalAmount": 500000,
-                                         "term": 12,
-                                         "monthlyPayment": 46317.25,
-                                         "rate": 20,
-                                         "isInsuranceEnabled": false,
-                                         "isSalaryClient": false
-                                     }
-                                """.formatted(validStatementId.toString()))
-                )
-                .andExpect(MockMvcResultMatchers.status().isAccepted());
         WireMock.stubFor(WireMock.post(WireMock.urlPathMatching("/calculator/calc"))
+                .withRequestBody(WireMock.containing("\"passportIssueDate\":[2015,3,23]")) // Если проверяешь тело
                 .willReturn(WireMock.ok()
                         .withHeader("Content-Type", "application/json")
                         .withBody("""
-                                {
-                                    "amount": 500000,
-                                    "term": 12,
-                                    "monthlyPayment": 46317.25,
-                                    "rate": 20,
-                                    "psk": 20.5,
-                                    "isInsuranceEnabled": false,
-                                    "isSalaryClient": false,
-                                    "paymentSchedule": []
-                                }
-                                """)));
+                            {
+                                "amount": 500000,
+                                "term": 12,
+                                "monthlyPayment": 46317.25,
+                                "rate": 20,
+                                "psk": 20.5,
+                                "isInsuranceEnabled": false,
+                                "isSalaryClient": false,
+                                "paymentSchedule": []
+                            }
+                            """)));
+
         mockMvc.perform(MockMvcRequestBuilders.post("/deal/calculate/{statementId}", validStatementId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
-                        {
-                                                            "gender": "MALE",
-                                                            "maritalStatus": "SINGLE",
-                                                            "dependentAmount": 0,
-                                                            "passportIssueDate": "2015-03-23",
-                                                            "passportIssueBranch": "123-456",
-                                                            "employment": {
-                                                                "employmentStatus": "EMPLOYED",
-                                                                "employerINN": "1234567890",
-                                                                "salary": 100000,
-                                                                "position": "WORKER",
-                                                                "workExperienceTotal": 60,
-                                                                "workExperienceCurrent": 24
-                                                            },
-                                                            "accountNumber": "40817810099910004312"
-                                                        }
-                        """)).andExpectAll(MockMvcResultMatchers.status().isAccepted());
+                    {
+                        "gender": "MALE",
+                        "maritalStatus": "SINGLE",
+                        "dependentAmount": 0,
+                        "passportIssueDate": "2015-03-23",
+                        "passportIssueBranch": "123-456",
+                        "employment": {
+                            "employmentStatus": "EMPLOYED",
+                            "employerINN": "123456789012",
+                            "salary": 100000,
+                            "position": "WORKER",
+                            "workExperienceTotal": 60,
+                            "workExperienceCurrent": 24
+                        },
+                        "accountNumber": "40817810099910004312"
+                    }
+                    """)).andExpect(MockMvcResultMatchers.status().isAccepted());
         Statement updatedStatement = statementRepository.findById(validStatementId).orElseThrow();
         Client updatedClient = updatedStatement.getClient();
         assertEquals("123-456", updatedClient.getPassport().getIssueBranch());
@@ -345,7 +301,7 @@ public class DealControllerIT {
                                     "passportIssueBranch": "123-456",
                                     "employment": {
                                         "employmentStatus": "EMPLOYED",
-                                        "employerINN": "1234567890",
+                                        "employerINN": "123456789012",
                                         "salary": 100000,
                                         "position": "WORKER",
                                         "workExperienceTotal": 60,

@@ -19,6 +19,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -44,9 +45,16 @@ class DealServiceTest {
     @DisplayName("Создание заявки: должен создать клиента, заявление и вернуть офферы с ID заявки")
     void createStatement_Success() {
         // Given
-        LoanStatementRequestDto requestDto = new LoanStatementRequestDto(
-                BigDecimal.valueOf(500000), 12, "Ivan", "Ivanov", null,
-                "test@test.com", null, "1234", "567890");
+        LoanStatementRequestDto requestDto = new LoanStatementRequestDto()
+                .amount(BigDecimal.valueOf(50000))
+                .term(12)
+                .firstName("Vlad")
+                .lastName("Simonyan")
+                .middleName("Igorevich")
+                .email("arte2m@example.com")
+                .birthday(null)
+                .passportNumber("1234")
+                .passportSeries("567890");
 
         Client mockClient = new Client();
         UUID statementId = UUID.randomUUID();
@@ -61,7 +69,7 @@ class DealServiceTest {
         List<LoanOfferDto> result = dealService.createStatement(requestDto);
 
         assertEquals(1, result.size());
-        assertEquals(statementId, result.get(0).statementId());
+        assertEquals(statementId, result.get(0).getStatementId());
         verify(clientService).createClient(requestDto);
         verify(statementService).createStatement(mockClient);
     }
@@ -86,10 +94,10 @@ class DealServiceTest {
     @DisplayName("Полный расчет: успех — статус CC_APPROVED и сохранение кредита")
     void calculateCredit_Success() {
         UUID id = UUID.randomUUID();
-        FinishRegistrationRequestDto requestDto = FinishRegistrationRequestDto.builder().build();
+        FinishRegistrationRequestDto requestDto = new FinishRegistrationRequestDto();
         Statement mockStatement = new Statement().setClient(new Client()).setStatusHistory(new ArrayList<>());
-        ScoringDataDto scoringData = ScoringDataDto.builder().build();
-        CreditDto creditDto = CreditDto.builder().build();
+        ScoringDataDto scoringData = new ScoringDataDto();
+        CreditDto creditDto = new CreditDto();
         Credit creditEntity = new Credit();
 
         when(statementService.getStatementById(id)).thenReturn(mockStatement);
@@ -109,11 +117,11 @@ class DealServiceTest {
     @DisplayName("Полный расчет: отказ скоринга — статус CC_DENIED")
     void calculateCredit_ScoringDenied() {
         UUID id = UUID.randomUUID();
-        FinishRegistrationRequestDto requestDto =  FinishRegistrationRequestDto.builder().build();
+        FinishRegistrationRequestDto requestDto =  new FinishRegistrationRequestDto();
         Statement mockStatement = new Statement().setClient(new Client()).setStatusHistory(new ArrayList<>());
 
         when(statementService.getStatementById(id)).thenReturn(mockStatement);
-        when(scoringDataMapper.toScoringDataDto(any(), any())).thenReturn(ScoringDataDto.builder().build());
+        when(scoringDataMapper.toScoringDataDto(any(), any())).thenReturn(new ScoringDataDto());
 
         when(calculatorRestClient.getCredit(any())).thenThrow(new ScoringException(ScoringError.BAD_AGE));
 

@@ -141,7 +141,7 @@ class CalculatorServiceTest {
                         EmploymentStatus.EMPLOYED,
                         "7728168971",
                         BigDecimal.valueOf(100000),
-                        Position.WORKER,
+                        EmploymentPosition.WORKER,
                         60,
                         24
                 ))

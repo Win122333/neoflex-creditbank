@@ -1,0 +1,341 @@
+openapi: 3.0.1
+info:
+  title: Deal Service API
+  description: API для управления кредитными заявками (Deal Service)
+  version: 1.0.0
+
+paths:
+  /deal/statement:
+    post:
+      summary: Расчет списка кредитных предложений
+      operationId: statement
+      tags:
+        - deal
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoanStatementRequestDto'
+      responses:
+        '201':
+          description: Список офферов успешно сформирован
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LoanOfferDto'
+
+  /deal/offer/select:
+    post:
+      summary: Выбор одного из предложений
+      operationId: select
+      tags:
+        - deal
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoanOfferDto'
+      responses:
+        '202':
+          description: Предложение принято в работу
+
+  /deal/calculate/{statementId}:
+    post:
+      summary: Завершение регистрации и полный расчет кредита
+      operationId: calculate
+      tags:
+        - deal
+      parameters:
+        - name: statementId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FinishRegistrationRequestDto'
+      responses:
+        '202':
+          description: Данные приняты, кредит рассчитан
+
+components:
+  schemas:
+    FinishRegistrationRequestDto:
+      type: object
+      properties:
+        gender:
+          $ref: '#/components/schemas/Gender'
+        maritalStatus:
+          $ref: '#/components/schemas/MaritalStatus'
+        dependentAmount:
+          type: integer
+          description: "Количество иждивенцев"
+        passportIssueDate:
+          type: string
+          format: date
+          description: "Дата выдачи паспорта"
+        passportIssueBranch:
+          type: string
+          description: "Кем выдан паспорт (подразделение)"
+        employment:
+          $ref: '#/components/schemas/EmploymentDto'
+        accountNumber:
+          type: string
+          description: "Номер счета"
+    EmploymentDto:
+      type: object
+      required: [ employmentStatus, employerINN, salary, workExperienceTotal, workExperienceCurrent ]
+      properties:
+        employmentStatus:
+          $ref: '#/components/schemas/EmploymentStatus'
+        employerINN:
+          type: string
+          pattern: '^\d{12}$'
+          description: "ИНН некорректен (должен состоять из 12 цифр)"
+        salary:
+          type: number
+          minimum: 0
+          description: "зарплата не может быть < 0"
+        employmentPosition:
+          $ref: '#/components/schemas/EmploymentPosition'
+        workExperienceTotal:
+          type: integer
+          minimum: 0
+          description: "Опыт работы не может быть отрицательным"
+        workExperienceCurrent:
+          type: integer
+          minimum: 0
+          description: "Опыт работы не может быть отрицательным"
+    LoanOfferDto:
+      type: object
+      required: [statementId, requestedAmount, totalAmount, term, monthlyPayment, rate, isInsuranceEnabled, isSalaryClient]
+      properties:
+        statementId:
+          type: string
+          format: uuid
+        requestedAmount:
+          type: number
+        totalAmount:
+          type: number
+        term:
+          type: integer
+        monthlyPayment:
+          type: number
+        rate:
+          type: number
+        isInsuranceEnabled:
+          type: boolean
+        isSalaryClient:
+          type: boolean
+
+    LoanStatementRequestDto:
+      type: object
+      required: [amount, term, firstName, lastName, passportSeries, passportNumber]
+      properties:
+        amount:
+          type: number
+          minimum: 20000
+          description: "Сумма кредита (не может быть меньше 20000)"
+        term:
+          type: integer
+          minimum: 6
+          description: "Срок кредита (не может быть меньше 6 месяцев)"
+        firstName:
+          type: string
+          pattern: '^[a-zA-Z]{2,30}?$'
+          description: "Имя (2 - 30 латинских символов)"
+        lastName:
+          type: string
+          pattern: '^[a-zA-Z]{2,30}?$'
+        middleName:
+          type: string
+          pattern: '^[a-zA-Z]{2,30}?$'
+        email:
+          type: string
+          format: email
+          pattern: "^[a-z0-9A-Z_!#$%&'*+/=?`{|}~^.-]+@[a-z0-9A-Z.-]+$"
+        birthday:
+          type: string
+          format: date
+          description: "Дата рождения (должна быть в прошлом, возраст >= 18 лет)"
+        passportSeries:
+          type: string
+          pattern: '^\d{4}$'
+        passportNumber:
+          type: string
+          pattern: '^\d{6}$'
+    CreditDto:
+      type: object
+      required: [ amount, term, monthlyPayment, rate, psk, isInsuranceEnabled, isSalaryClient, paymentSchedule ]
+      properties:
+        amount:
+          type: number
+          description: "Сумма кредита"
+        term:
+          type: integer
+          description: "Срок кредита в месяцах"
+        monthlyPayment:
+          type: number
+          description: "Ежемесячный платеж"
+        rate:
+          type: number
+          description: "Процентная ставка"
+        psk:
+          type: number
+          description: "Полная стоимость кредита (ПСК)"
+        isInsuranceEnabled:
+          type: boolean
+        isSalaryClient:
+          type: boolean
+        paymentSchedule:
+          type: array
+          description: "График платежей"
+          items:
+            $ref: '#/components/schemas/PaymentScheduleElementDto'
+    PaymentScheduleElementDto:
+      type: object
+      required: [ number, date, totalPayment, interestPayment, debtPayment, remainingDebt ]
+      properties:
+        number:
+          type: integer
+          description: "Номер платежа"
+        date:
+          type: string
+          format: date
+          description: "Дата платежа"
+        totalPayment:
+          type: number
+          description: "Общая сумма платежа"
+        interestPayment:
+          type: number
+          description: "Выплата процентов"
+        debtPayment:
+          type: number
+          description: "Выплата основного долга"
+        remainingDebt:
+          type: number
+          description: "Остаток долга"
+    ScoringDataDto:
+      type: object
+      required:
+        - amount
+        - term
+        - firstName
+        - lastName
+        - gender
+        - birthdate
+        - passportSeries
+        - passportNumber
+        - passportIssueDate
+        - passportIssueBranch
+        - maritalStatus
+        - dependentAmount
+        - employment
+        - accountNumber
+        - isInsuranceEnabled
+        - isSalaryClient
+      properties:
+        amount:
+          type: number
+          minimum: 20000
+          description: "Сумма кредита (не может быть меньше 20000)"
+        term:
+          type: integer
+          minimum: 6
+          description: "Срок кредита (не может быть меньше 6 месяцев)"
+        firstName:
+          type: string
+          pattern: '^[a-zA-Z]{2,30}?$'
+          description: "Имя (2 - 30 латинских символов)"
+        lastName:
+          type: string
+          pattern: '^[a-zA-Z]{2,30}?$'
+          description: "Фамилия (2 - 30 латинских символов)"
+        middleName:
+          type: string
+          pattern: '^[a-zA-Z]{2,30}?$'
+          description: "Отчество (2 - 30 латинских символов)"
+        gender:
+          $ref: '#/components/schemas/Gender'
+        birthdate:
+          type: string
+          format: date
+          description: "Дата рождения (должна быть в прошлом, возраст >= 18 лет)"
+        passportSeries:
+          type: string
+          pattern: '^\d{4}$'
+        passportNumber:
+          type: string
+          pattern: '^\d{6}$'
+        passportIssueDate:
+          type: string
+          format: date
+          description: "Дата выдачи паспорта (не может быть в будущем)"
+        passportIssueBranch:
+          type: string
+          description: "Отделение выдачи паспорта"
+        maritalStatus:
+          $ref: '#/components/schemas/MaritalStatus'
+        dependentAmount:
+          type: integer
+          minimum: 0
+          description: "Количество иждивенцев"
+        employment:
+          $ref: '#/components/schemas/EmploymentDto'
+        accountNumber:
+          type: string
+          description: "Номер счета"
+        isInsuranceEnabled:
+          type: boolean
+        isSalaryClient:
+          type: boolean
+    StatementStatusHistoryDto:
+      type: object
+      required: [ status, time, changeType ]
+      properties:
+        status:
+          $ref: '#/components/schemas/ApplicationStatus'
+        time:
+          type: string
+          format: date-time
+          description: "Время изменения статуса"
+          example: "2026-03-26T20:59:14.000Z"
+        changeType:
+          $ref: '#/components/schemas/ChangeType'
+
+    ApplicationStatus:
+      description: "Статус заявки"
+      type: string
+      enum: [ PREAPPROVAL, APPROVED, CC_DENIED, CC_APPROVED, PREPARE_DOCUMENTS, DOCUMENT_CREATED, CLIENT_DENIED, DOCUMENT_SIGNED, CREDIT_ISSUED ]
+
+    ChangeType:
+      description: "Тип изменения (автоматически или вручную)"
+      type: string
+      enum: [ AUTOMATIC, MANUAL ]
+
+    MaritalStatus:
+      description: "Семейное положение"
+      type: string
+      enum: [ MARRIED, SINGLE, DIVORCED, WIDOWED, SEPARATED ]
+
+    Gender:
+      description: "Пол"
+      type: string
+      enum: [ MALE, FEMALE, NON_BINARY ]
+
+    EmploymentPosition:
+      description: "Рабочее положение"
+      type: string
+      enum: [ WORKER, MID_MANAGER, TOP_MANAGER, OWNER ]
+
+    EmploymentStatus:
+      description: "Рабочий статус"
+      type: string
+      enum: [ EMPLOYED, UNEMPLOYED, BUSINESS_OWNER, SELF_EMPLOYED ]

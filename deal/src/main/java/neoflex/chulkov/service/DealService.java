@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -43,26 +44,26 @@ public class DealService {
                 .stream()
                 .map(offer -> new LoanOfferDto(
                         statement.getStatementId(),
-                        offer.requestedAmount(),
-                        offer.totalAmount(),
-                        offer.term(),
-                        offer.monthlyPayment(),
-                        offer.rate(),
-                        offer.isInsuranceEnabled(),
-                        offer.isSalaryClient()))
+                        offer.getRequestedAmount(),
+                        offer.getTotalAmount(),
+                        offer.getTerm(),
+                        offer.getMonthlyPayment(),
+                        offer.getRate(),
+                        offer.getIsInsuranceEnabled(),
+                        offer.getIsSalaryClient()))
                 .toList();
     }
 
     @Transactional
     public void selectOffer(LoanOfferDto dto) {
-        Statement statement = statementService.getStatementById(dto.statementId());
+        Statement statement = statementService.getStatementById(dto.getStatementId());
         statement
                 .setStatus(ApplicationStatus.APPROVED)
                 .setAppliedOffer(dto);
         statement.getStatusHistory().add(
                 new StatementStatusHistoryDto(
                         ApplicationStatus.APPROVED,
-                        LocalDateTime.now(),
+                        OffsetDateTime.now(),
                         ChangeType.AUTOMATIC
         ));
         statementService.saveStatement(statement);
@@ -87,7 +88,7 @@ public class DealService {
             statement.getStatusHistory().add(
                     new StatementStatusHistoryDto(
                             ApplicationStatus.CC_APPROVED,
-                            LocalDateTime.now(),
+                            OffsetDateTime.now(),
                             ChangeType.AUTOMATIC
                     )
             );
@@ -98,7 +99,7 @@ public class DealService {
             statement.setStatus(ApplicationStatus.CC_DENIED);
             statement.getStatusHistory().add(new StatementStatusHistoryDto(
                     ApplicationStatus.CC_DENIED,
-                    LocalDateTime.now(),
+                    OffsetDateTime.now(),
                     ChangeType.AUTOMATIC
             ));
             statementService.saveStatement(statement);
