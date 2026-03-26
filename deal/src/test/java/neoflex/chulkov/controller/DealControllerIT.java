@@ -30,7 +30,7 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.*;
 
 @Transactional
-@SpringBootTest(classes = DealApplication.class)
+@SpringBootTest
 @AutoConfigureMockMvc
 @WireMockTest(httpPort = 54321)
 public class DealControllerIT {

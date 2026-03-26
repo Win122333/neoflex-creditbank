@@ -10,3 +10,16 @@ springdoc:
     url: /openapi.json
 server:
   port: 8081
+
+management:
+  health:
+    livenessstate:
+      enabled: true
+    readinessstate:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include:
+          - health
+          - prometheus

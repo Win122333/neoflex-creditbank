@@ -1,5 +1,7 @@
 package neoflex.chulkov.controller;
 
+import neoflex.chulkov.api.DealApiController;
+import neoflex.chulkov.api.DealApiDelegate;
 import neoflex.chulkov.dto.LoanOfferDto;
 import neoflex.chulkov.service.DealService;
 import org.junit.jupiter.api.BeforeAll;
@@ -8,7 +10,9 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -22,12 +26,12 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @AutoConfigureMockMvc
-@WebMvcTest(DealController.class)
+@WebMvcTest(DealApiController.class)
 class DealControllerTest {
     @Autowired
     MockMvc mockMvc;
     @MockitoBean
-    DealService dealService;
+    private DealApiDelegate dealApiDelegate;
 
     static List<LoanOfferDto> listOfLoanOffers;
 
@@ -78,8 +82,8 @@ class DealControllerTest {
     }
     @Test
     void getStatement_ShouldReturnListOf4LoanOfferDto() throws Exception {
-        Mockito.when(dealService.createStatement(any()))
-                .thenReturn(listOfLoanOffers);
+        Mockito.when(dealApiDelegate.statement(any()))
+                .thenReturn(ResponseEntity.status(HttpStatus.CREATED).body(listOfLoanOffers));
 
         mockMvc.perform(
                 MockMvcRequestBuilders.post("/deal/statement")
