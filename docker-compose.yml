@@ -9,5 +9,31 @@ services:
     ports:
       - "5432:5432"
     volumes:
-    - ./data:/var/lib/postgresql/data
+      - ./data/postgres:/var/lib/postgresql/data
     restart: always
+
+  creditbank-metrics:
+    image: victoriametrics/victoria-metrics:v1.93.12
+    container_name: creditbank-metrics
+    ports:
+      - "8428:8428"
+    volumes:
+      - ./config/victoria-metrics/promscrape.yaml:/promscrape.yaml
+      - ./data/victoria:/victoria-metrics-data
+    command:
+      - "-promscrape.config=/promscrape.yaml"
+    restart: always
+    depends_on:
+      - postgres
+
+  creditbank-grafana:
+    image: grafana/grafana:10.2.4
+    container_name: creditbank-grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana-storage:/var/lib/grafana
+    restart: always
+
+volumes:
+  grafana-storage:

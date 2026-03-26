@@ -5,31 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="8bb68439-b45d-448d-a677-68c16fb00eaa" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/java/neoflex/chulkov/dto/enums/CreditStatus.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/neoflex/chulkov/dto/enums/EmploymentPosition.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../deal/src/main/java/neoflex/chulkov/exception/ScoringException.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../deal/src/test/java/neoflex/chulkov/annotation/AdultValidatorTest.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../deal/src/test/java/neoflex/chulkov/controller/DealControllerIT.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/neoflex/chulkov/dto/EmploymentDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/neoflex/chulkov/dto/EmploymentDto.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/neoflex/chulkov/dto/ErrorResponseDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/neoflex/chulkov/dto/ErrorResponseDto.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/neoflex/chulkov/dto/StatementStatusHistoryDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/neoflex/chulkov/dto/StatementStatusHistoryDto.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/neoflex/chulkov/dto/enums/ChangeType.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/neoflex/chulkov/dto/enums/ChangeType.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/neoflex/chulkov/dto/enums/EmploymentStatus.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/neoflex/chulkov/dto/enums/EmploymentStatus.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/neoflex/chulkov/dto/enums/Position.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/neoflex/chulkov/dto/enums/StatementStatus.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/neoflex/chulkov/dto/enums/ApplicationStatus.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/neoflex/chulkov/service/CalculatorService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/neoflex/chulkov/service/CalculatorService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../deal/db/db_create.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../deal/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../deal/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../deal/src/main/java/neoflex/chulkov/controller/DealController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../deal/src/main/java/neoflex/chulkov/controller/DealController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../deal/src/main/java/neoflex/chulkov/entity/Employment.java" beforeDir="false" afterPath="$PROJECT_DIR$/../deal/src/main/java/neoflex/chulkov/entity/Employment.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../deal/src/main/java/neoflex/chulkov/entity/Passport.java" beforeDir="false" afterPath="$PROJECT_DIR$/../deal/src/main/java/neoflex/chulkov/entity/Passport.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../deal/src/main/java/neoflex/chulkov/entity/Statement.java" beforeDir="false" afterPath="$PROJECT_DIR$/../deal/src/main/java/neoflex/chulkov/entity/Statement.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../deal/src/main/java/neoflex/chulkov/mapper/ClientMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/../deal/src/main/java/neoflex/chulkov/mapper/ClientMapper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../deal/src/main/java/neoflex/chulkov/service/ClientService.java" beforeDir="false" afterPath="$PROJECT_DIR$/../deal/src/main/java/neoflex/chulkov/service/ClientService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../deal/src/main/java/neoflex/chulkov/service/CreditService.java" beforeDir="false" afterPath="$PROJECT_DIR$/../deal/src/main/java/neoflex/chulkov/service/CreditService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../deal/src/main/java/neoflex/chulkov/service/DealService.java" beforeDir="false" afterPath="$PROJECT_DIR$/../deal/src/main/java/neoflex/chulkov/service/DealService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../deal/src/main/java/neoflex/chulkov/service/StatementService.java" beforeDir="false" afterPath="$PROJECT_DIR$/../deal/src/main/java/neoflex/chulkov/service/StatementService.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -78,7 +54,7 @@
     "RunOnceActivity.git.unshallow": "true",
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
     "Spring Boot.CalculatorApplication.executor": "Run",
-    "git-widget-placeholder": "c3a5470a",
+    "git-widget-placeholder": "feature/MVP-2",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "C:/Users/artem/IdeaProjects/neoflex-creditbank/calculator",
     "nodejs_package_manager_path": "npm",
@@ -119,6 +95,7 @@
       <workItem from="1774187731306" duration="3996000" />
       <workItem from="1774253707712" duration="2603000" />
       <workItem from="1774266390308" duration="2176000" />
+      <workItem from="1774529908934" duration="605000" />
     </task>
     <servers />
   </component>

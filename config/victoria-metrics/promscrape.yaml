@@ -1,0 +1,5 @@
+scrape_configs:
+  - job_name: neoflex_creditbank_deal_admin
+    static_configs:
+      - targets: ["host.docker.internal:8082", "host.docker.internal:8081"]
+    metrics_path: /actuator/prometheus
