@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import neoflex.chulkov.dto.FinishRegistrationRequestDto;
 import neoflex.chulkov.dto.LoanStatementRequestDto;
 import neoflex.chulkov.entity.Client;
+import neoflex.chulkov.exception.EmailAlreadyExistsException;
 import neoflex.chulkov.mapper.ClientMapper;
 import neoflex.chulkov.repository.ClientRepository;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,8 @@ public class ClientService {
     private final ClientMapper clientMapper;
 
     public Client createClient(LoanStatementRequestDto dto) {
+        if (clientRepository.existsByEmail(dto.getEmail()))
+            throw new EmailAlreadyExistsException("Клиент с данным email %s уже существует".formatted(dto.getEmail()));
         Client client = clientMapper.toClient(dto);
         log.debug("save client {}", client);
         return saveClient(client);

@@ -1,7 +1,7 @@
 openapi: 3.0.1
 info:
-  title: Deal Service API
-  description: API для управления кредитными заявками (Deal Service)
+  title: API Микросервиса Deal
+  description: API для управления кредитными заявками
   version: 1.0.0
 
 paths:
@@ -309,6 +309,24 @@ components:
           example: "2026-03-26T20:59:14.000Z"
         changeType:
           $ref: '#/components/schemas/ChangeType'
+    ErrorResponseDto:
+      type: object
+      description: Схема для возврата ошибок валидации или бизнес-логики
+      properties:
+        status:
+          type: integer
+          format: int32
+          example: 400
+        error:
+          type: string
+          example: "Возраст не может быть меньше 18 лет"
+        message:
+          type: string
+          example: "Ошибка валидации"
+      required:
+        - status
+        - error
+        - message
 
     ApplicationStatus:
       description: "Статус заявки"

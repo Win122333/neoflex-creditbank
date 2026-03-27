@@ -11,6 +11,7 @@ import neoflex.chulkov.dto.enums.CreditStatus;
 import neoflex.chulkov.entity.Client;
 import neoflex.chulkov.entity.Credit;
 import neoflex.chulkov.entity.Statement;
+import neoflex.chulkov.exception.InvalidStatementStatusException;
 import neoflex.chulkov.exception.ScoringException;
 import neoflex.chulkov.mapper.ClientMapper;
 import neoflex.chulkov.mapper.CreditMapper;
@@ -73,6 +74,9 @@ public class DealService {
     public void calculateCredit(FinishRegistrationRequestDto dto, String statementId) {
         Statement statement = statementService.getStatementById(UUID.fromString(statementId));
 
+        if(statement.getStatus() != ApplicationStatus.APPROVED)
+            throw new InvalidStatementStatusException("Заявка находится в неверном статусе");
+
         clientService.updateClient(statement.getClient(), dto);
 
         ScoringDataDto scoringData = scoringDataMapper.toScoringDataDto(statement, dto);
@@ -93,6 +97,7 @@ public class DealService {
                     )
             );
             statementService.saveStatement(statement);
+            log.info("Заявка {} успешно прошла скоринг", statementId);
         }
         catch (ScoringException e) {
             log.warn("Отказ по заявке {}: {}", statementId, e.getMessage());

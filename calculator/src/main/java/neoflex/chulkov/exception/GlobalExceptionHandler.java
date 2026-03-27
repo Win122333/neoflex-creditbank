@@ -22,9 +22,8 @@ public class GlobalExceptionHandler {
                 HttpStatus.BAD_REQUEST.value(),
                 e.getFieldErrors().stream()
                         .map(DefaultMessageSourceResolvable::getDefaultMessage)
-                        .reduce("", (x, z) -> x.concat(", ").concat(z))
+                        .reduce("", (x, z) -> x.concat(" ").concat(z))
                 , "Ошибка валидации");
-        //TODO
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
 }
