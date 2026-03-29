@@ -124,6 +124,7 @@ public class DealControllerIT {
                 .passportNumber("1234")
                 .passportSeries("567890"));
         Statement statement = new Statement();
+        statement.setStatus(ApplicationStatus.PREAPPROVAL);
         statement.setClient(client);
         statement = statementRepository.save(statement);
         UUID validStatementId = statement.getStatementId();
@@ -153,6 +154,42 @@ public class DealControllerIT {
     }
 
     @Test
+    @DisplayName("Не получится выбрать предложение кредита, если неверный статус")
+    void select_RequestIsValid_shouldThrowExceptionWhenWronApplicationStatus() throws Exception {
+        Client client = clientService.createClient(new LoanStatementRequestDto()
+                .amount(BigDecimal.valueOf(50000))
+                .term(12)
+                .firstName("Vlad")
+                .lastName("Simonyan")
+                .middleName("Igorevich")
+                .email("arte2m@example.com")
+                .birthday(LocalDate.parse("1995-03-23"))
+                .passportNumber("1234")
+                .passportSeries("567890"));
+        Statement statement = new Statement();
+        statement.setClient(client);
+        statement = statementRepository.save(statement);
+        UUID validStatementId = statement.getStatementId();
+        mockMvc.perform(MockMvcRequestBuilders.post("/deal/offer/select")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                    {
+                                         "statementId": "%s",
+                                         "requestedAmount": 500000,
+                                         "totalAmount": 500000,
+                                         "term": 12,
+                                         "monthlyPayment": 46317.25,
+                                         "rate": 20,
+                                         "isInsuranceEnabled": false,
+                                         "isSalaryClient": false
+                                     }
+                                """.formatted(validStatementId.toString()))
+                )
+                .andExpect(MockMvcResultMatchers.status().isConflict());
+
+    }
+
+    @Test
     @DisplayName("Насыщает информацию клиента, обновляет заявление и сохраняет в бд ифнормацию о кредите")
     void calculateCredit_RequestIsValid_ShouldUpdateClientAndStatementAndSaveCreditInformation() throws Exception {
         Client client = clientService.createClient(new LoanStatementRequestDto()
@@ -166,6 +203,7 @@ public class DealControllerIT {
                         .passportNumber("1234")
                         .passportSeries("567890"));
         Statement statement = new Statement();
+        statement.setStatus(ApplicationStatus.APPROVED);
         statement.setClient(client);
         statement = statementRepository.save(statement);
         UUID validStatementId = statement.getStatementId();
