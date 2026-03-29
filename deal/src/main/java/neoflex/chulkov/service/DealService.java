@@ -62,9 +62,11 @@ public class DealService {
     public void selectOffer(LoanOfferDto dto) {
         log.info("Выбор кредитного предложения для заявки ID: {}", dto.getStatementId());
         log.debug("Параметры выбранного предложения: {}", dto);
-
         Statement statement = statementService.getStatementById(dto.getStatementId());
         log.debug("Текущий статус заявки {}: {}", dto.getStatementId(), statement.getStatus());
+
+        if (statement.getStatus() != ApplicationStatus.PREAPPROVAL)
+            throw new InvalidStatementStatusException("Заяка не находится в статусе PREAPPROVAL");
 
         statement
                 .setStatus(ApplicationStatus.APPROVED)

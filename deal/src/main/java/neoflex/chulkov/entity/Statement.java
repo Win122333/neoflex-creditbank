@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import lombok.experimental.Accessors;
 import neoflex.chulkov.dto.LoanOfferDto;
 import neoflex.chulkov.dto.StatementStatusHistoryDto;
@@ -21,6 +22,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
+@ToString
 @Accessors(chain = true)
 public class Statement {
     @Id

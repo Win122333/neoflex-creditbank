@@ -16,6 +16,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@ToString
 @Accessors(chain = true)
 @Table(name = "client")
 public class Client {

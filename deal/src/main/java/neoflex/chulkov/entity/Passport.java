@@ -11,6 +11,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@ToString
 @Accessors(chain = true)
 public class Passport {
     private UUID passportUUID;

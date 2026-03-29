@@ -16,6 +16,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @Entity
+@ToString
 @Table(name = "credit")
 public class Credit {
     @Id
