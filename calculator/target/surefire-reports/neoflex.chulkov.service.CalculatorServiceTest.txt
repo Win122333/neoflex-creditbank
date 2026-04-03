@@ -1,4 +1,0 @@
--------------------------------------------------------------------------------
-Test set: neoflex.chulkov.service.CalculatorServiceTest
--------------------------------------------------------------------------------
-Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.184 s -- in neoflex.chulkov.service.CalculatorServiceTest
