@@ -10,6 +10,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -87,7 +88,6 @@ class CalculatorServiceTest {
         CreditDto result = service.calculateCredit(validDto);
 
         assertNotNull(result, "CreditDto не должен быть null");
-
         assertEquals(0, result.amount().compareTo(BigDecimal.valueOf(1100000)),
                 "Сумма кредита должна включать 10% страховки");
 
@@ -162,5 +162,4 @@ class CalculatorServiceTest {
                         , ScoringError.UNEMPLOYED)
         );
     }
-
 }

@@ -208,7 +208,7 @@ public class DealControllerIT {
         statement = statementRepository.save(statement);
         UUID validStatementId = statement.getStatementId();
         WireMock.stubFor(WireMock.post(WireMock.urlPathMatching("/calculator/calc"))
-                .withRequestBody(WireMock.containing("\"passportIssueDate\":[2015,3,23]")) // Если проверяешь тело
+                .withRequestBody(WireMock.containing("\"passportIssueDate\":[2015,3,23]"))
                 .willReturn(WireMock.ok()
                         .withHeader("Content-Type", "application/json")
                         .withBody("""
