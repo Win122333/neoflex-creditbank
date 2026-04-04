@@ -149,9 +149,9 @@ public class CalculatorService {
             rate = rate.add(BigDecimal.valueOf(1));
 
         //position
-        if (employer.position() == Position.MIDDLE_MANAGER)
+        if (employer.employmentPosition() == EmploymentPosition.MID_MANAGER)
             rate = rate.subtract(BigDecimal.valueOf(2));
-        if (employer.position() == Position.TOP_MANAGER)
+        if (employer.employmentPosition() == EmploymentPosition.TOP_MANAGER)
             rate = rate.subtract(BigDecimal.valueOf(3));
 
         //marital status

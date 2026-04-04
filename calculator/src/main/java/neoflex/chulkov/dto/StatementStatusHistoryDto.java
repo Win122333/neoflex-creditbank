@@ -1,12 +1,12 @@
 package neoflex.chulkov.dto;
 
+import neoflex.chulkov.dto.enums.ApplicationStatus;
 import neoflex.chulkov.dto.enums.ChangeType;
-import neoflex.chulkov.dto.enums.StatementStatus;
 
 import java.time.LocalDateTime;
 
 public record StatementStatusHistoryDto(
-        StatementStatus status,
+        ApplicationStatus status,
         LocalDateTime time,
         ChangeType changeType
 ) {

@@ -1,13 +1,13 @@
 package neoflex.chulkov.dto.enums;
 
-public enum StatementStatus {
+public enum ApplicationStatus {
     PREAPPROVAL,
     APPROVED,
+    CC_DENIED,
     CC_APPROVED,
-    READY_TO_ISSUE,
-    ISSUED,
-    REJECTED,
+    PREPARE_DOCUMENTS,
+    DOCUMENT_CREATED,
     CLIENT_DENIED,
-    DOCUMENTS_SIGNED,
+    DOCUMENT_SIGNED,
     CREDIT_ISSUED
 }

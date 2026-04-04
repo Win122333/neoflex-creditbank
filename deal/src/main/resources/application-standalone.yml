@@ -1,0 +1,30 @@
+spring:
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+  datasource:
+    url: jdbc:postgresql://localhost:5432/deal
+    username: user
+    password: pass
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+
+deal:
+  calculator-base-url: http://localhost:8081
+server:
+  port: 8082
+
+management:
+  health:
+    livenessstate:
+      enabled: true
+    readinessstate:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include:
+          - health
+          - prometheus
