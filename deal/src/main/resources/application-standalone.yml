@@ -1,4 +1,6 @@
 spring:
+  liquibase:
+    change-log: db/changelog/changelog-master.xml
   jackson:
     serialization:
       write-dates-as-timestamps: false
@@ -9,7 +11,7 @@ spring:
   jpa:
     show-sql: true
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
 
 deal:
   calculator-base-url: http://localhost:8081
