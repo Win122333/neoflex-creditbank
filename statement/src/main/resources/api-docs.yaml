@@ -1,0 +1,132 @@
+openapi: 3.0.1
+info:
+  title: API Микросервиса Statement
+  description: API для прескоринга + запрос на расчёт возможных условий кредита.
+  version: 1.0.0
+
+paths:
+  /statement:
+    post:
+      summary: Прескоринг + запрос на расчёт возможных условий кредита.
+      operationId: statement
+      tags:
+        - statement
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoanStatementRequestDto'
+      responses:
+        '201':
+          description: Список офферов успешно сформирован
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LoanOfferDto'
+  /statement/offer:
+    post:
+      summary: Выбор одного из предложений.
+      operationId: select
+      tags:
+        - statement
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoanOfferDto'
+      responses:
+        '202':
+          description: Предложение принято в работу
+
+components:
+  schemas:
+    LoanStatementRequestDto:
+      type: object
+      required: [ amount, term, firstName, lastName, passportSeries, passportNumber ]
+      properties:
+        amount:
+          type: number
+          minimum: 20000
+          description: "Сумма кредита (не может быть меньше 20000)"
+        term:
+          type: integer
+          minimum: 6
+          description: "Срок кредита (не может быть меньше 6 месяцев)"
+        firstName:
+          type: string
+          pattern: '^[a-zA-Z]{2,30}?$'
+          description: "Имя (2 - 30 латинских символов)"
+        lastName:
+          type: string
+          pattern: '^[a-zA-Z]{2,30}?$'
+        middleName:
+          type: string
+          pattern: '^[a-zA-Z]{2,30}?$'
+        email:
+          type: string
+          format: email
+          pattern: "^[a-z0-9A-Z_!#$%&'*+/=?`{|}~^.-]+@[a-z0-9A-Z.-]+$"
+        birthday:
+          type: string
+          format: date
+          description: "Дата рождения (должна быть в прошлом, возраст >= 18 лет)"
+        passportSeries:
+          type: string
+          pattern: '^\d{4}$'
+        passportNumber:
+          type: string
+          pattern: '^\d{6}$'
+    LoanOfferDto:
+      type: object
+      required: [ statementId, requestedAmount, totalAmount, term, monthlyPayment, rate, isInsuranceEnabled, isSalaryClient ]
+      properties:
+        statementId:
+          type: string
+          format: uuid
+        requestedAmount:
+          type: number
+        totalAmount:
+          type: number
+        term:
+          type: integer
+        monthlyPayment:
+          type: number
+        rate:
+          type: number
+        isInsuranceEnabled:
+          type: boolean
+        isSalaryClient:
+          type: boolean
+    ApplicationStatus:
+      description: "Статус заявки"
+      type: string
+      enum: [ PREAPPROVAL, APPROVED, CC_DENIED, CC_APPROVED, PREPARE_DOCUMENTS, DOCUMENT_CREATED, CLIENT_DENIED, DOCUMENT_SIGNED, CREDIT_ISSUED ]
+
+    ChangeType:
+      description: "Тип изменения (автоматически или вручную)"
+      type: string
+      enum: [ AUTOMATIC, MANUAL ]
+
+    MaritalStatus:
+      description: "Семейное положение"
+      type: string
+      enum: [ MARRIED, SINGLE, DIVORCED, WIDOWED, SEPARATED ]
+
+    Gender:
+      description: "Пол"
+      type: string
+      enum: [ MALE, FEMALE, NON_BINARY ]
+
+    EmploymentPosition:
+      description: "Рабочее положение"
+      type: string
+      enum: [ WORKER, MID_MANAGER, TOP_MANAGER, OWNER ]
+
+    EmploymentStatus:
+      description: "Рабочий статус"
+      type: string
+      enum: [ EMPLOYED, UNEMPLOYED, BUSINESS_OWNER, SELF_EMPLOYED ]
