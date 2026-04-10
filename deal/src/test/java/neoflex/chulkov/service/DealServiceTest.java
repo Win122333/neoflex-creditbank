@@ -79,7 +79,7 @@ class DealServiceTest {
     void selectOffer_Success() {
         UUID id = UUID.randomUUID();
         LoanOfferDto offerDto = new LoanOfferDto(id, null, null, null, null, null, null, null);
-        Statement mockStatement = new Statement().setStatementId(id).setStatusHistory(new ArrayList<>());
+        Statement mockStatement = new Statement().setStatementId(id).setStatusHistory(new ArrayList<>()).setStatus(ApplicationStatus.PREAPPROVAL);
 
         when(statementService.getStatementById(id)).thenReturn(mockStatement);
 
@@ -95,7 +95,7 @@ class DealServiceTest {
     void calculateCredit_Success() {
         UUID id = UUID.randomUUID();
         FinishRegistrationRequestDto requestDto = new FinishRegistrationRequestDto();
-        Statement mockStatement = new Statement().setClient(new Client()).setStatusHistory(new ArrayList<>());
+        Statement mockStatement = new Statement().setClient(new Client()).setStatusHistory(new ArrayList<>()).setStatus(ApplicationStatus.APPROVED);
         ScoringDataDto scoringData = new ScoringDataDto();
         CreditDto creditDto = new CreditDto();
         Credit creditEntity = new Credit();
@@ -118,7 +118,7 @@ class DealServiceTest {
     void calculateCredit_ScoringDenied() {
         UUID id = UUID.randomUUID();
         FinishRegistrationRequestDto requestDto =  new FinishRegistrationRequestDto();
-        Statement mockStatement = new Statement().setClient(new Client()).setStatusHistory(new ArrayList<>());
+        Statement mockStatement = new Statement().setClient(new Client()).setStatusHistory(new ArrayList<>()).setStatus(ApplicationStatus.APPROVED);
 
         when(statementService.getStatementById(id)).thenReturn(mockStatement);
         when(scoringDataMapper.toScoringDataDto(any(), any())).thenReturn(new ScoringDataDto());

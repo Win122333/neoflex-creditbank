@@ -1,4 +1,6 @@
 spring:
+  liquibase:
+    change-log: db/changelog/changelog-master.xml
   datasource:
     url: jdbc:tc:postgresql:16:///deal?TC_DAEMON
     username: deal
