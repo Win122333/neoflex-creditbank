@@ -23,7 +23,6 @@ public class StatementApiDelegateImpl implements StatementApiDelegate {
     ) {
         log.info("called /statement with request = {}", loanStatementRequestDto);
         List<LoanOfferDto> response = dealRestClient.getAvailableOffers(loanStatementRequestDto);
-        log.info("Ответ: {}", response);
         return ResponseEntity.ok(response);
     }
 

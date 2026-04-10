@@ -33,7 +33,7 @@ public class StatementService {
     }
 
     public Statement getStatementById(UUID statementId) {
-        return statementRepository.findById(statementId)
+        return statementRepository.findByIdForUpdate(statementId)
                 .orElseThrow(() -> new StatementNotFoundException("Заявка не найдена с UUID == " + statementId));
     }
 }
