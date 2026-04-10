@@ -15,7 +15,9 @@ public class StatementApiDelegateImpl implements StatementApiDelegate {
     public ResponseEntity<List<LoanOfferDto>> statement(
             LoanStatementRequestDto loanStatementRequestDto
     ) {
-        return StatementApiDelegate.super.statement(loanStatementRequestDto);
+        log.info("called /statement with request = {}", loanStatementRequestDto);
+        log.info("Ответ: {}", response);
+        return response;
     }
 
     @Override
