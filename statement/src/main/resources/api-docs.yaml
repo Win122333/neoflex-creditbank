@@ -105,7 +105,24 @@ components:
       description: "Статус заявки"
       type: string
       enum: [ PREAPPROVAL, APPROVED, CC_DENIED, CC_APPROVED, PREPARE_DOCUMENTS, DOCUMENT_CREATED, CLIENT_DENIED, DOCUMENT_SIGNED, CREDIT_ISSUED ]
-
+    ErrorResponseDto:
+      type: object
+      description: Схема для возврата ошибок валидации или бизнес-логики
+      properties:
+        status:
+          type: integer
+          format: int32
+          example: 400
+        error:
+          type: string
+          example: "Возраст не может быть меньше 18 лет"
+        message:
+          type: string
+          example: "Ошибка валидации"
+      required:
+        - status
+        - error
+        - message
     ChangeType:
       description: "Тип изменения (автоматически или вручную)"
       type: string
