@@ -8,7 +8,7 @@ paths:
   /statement:
     post:
       summary: Прескоринг + запрос на расчёт возможных условий кредита.
-      operationId: statement
+      operationId: getAvailableCreditOffers
       tags:
         - statement
       requestBody:
@@ -26,10 +26,16 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/LoanOfferDto'
+        '400':
+          description: Ошибка валидации
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
   /statement/offer:
     post:
       summary: Выбор одного из предложений.
-      operationId: select
+      operationId: selectCreditOffer
       tags:
         - statement
       requestBody:
