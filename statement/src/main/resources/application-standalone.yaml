@@ -2,3 +2,16 @@ statement:
   deal-base-url: http://localhost:8082
 server:
   port: 8083
+
+management:
+  health:
+    livenessstate:
+      enabled: true
+    readinessstate:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include:
+          - health
+          - prometheus
