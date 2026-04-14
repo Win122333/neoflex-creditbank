@@ -12,9 +12,10 @@ import org.springframework.web.client.RestClient;
 public class Beans {
     @Bean
     public RestClient getRestClient(
+            RestClient.Builder builder,
             @Value("${deal.calculator-base-url:http://localhost:8081}") String baseUrl
     ) {
-        return RestClient.builder()
+        return builder
                 .baseUrl(baseUrl)
                 .build();
     }

@@ -9,9 +9,10 @@ import org.springframework.web.client.RestClient;
 public class RestClientConfig {
     @Bean
     public RestClient getRestClient(
-            @Value("${statement.deal-base-url:localhost:8083}") String baseUrl
+            RestClient.Builder builder,
+            @Value("${statement.deal-base-url:localhost:8082}") String baseUrl
     ) {
-        return RestClient.builder()
+        return builder
                 .baseUrl(baseUrl)
                 .build();
     }
