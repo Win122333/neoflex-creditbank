@@ -35,7 +35,7 @@ public class StatementApiDelegateImpl implements StatementApiDelegate {
     public ResponseEntity<List<LoanOfferDto>> getAvailableCreditOffers(
             LoanStatementRequestDto loanStatementRequestDto
     ) {
-        log.info("called /statement with");
+        log.info("called /statement");
         List<LoanOfferDto> response = statementService.getAvailableOffers(loanStatementRequestDto);
         return ResponseEntity.ok(response);
     }

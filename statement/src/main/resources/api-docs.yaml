@@ -80,6 +80,11 @@ components:
           type: string
           format: date
           description: "Дата рождения (должна быть в прошлом, возраст >= 18 лет)"
+          x-validation:
+            type: custom
+            annotation: "@Adult"
+            parameters:
+              message: "Возраст должен быть больше 18"
         passportSeries:
           type: string
           pattern: '^\d{4}$'

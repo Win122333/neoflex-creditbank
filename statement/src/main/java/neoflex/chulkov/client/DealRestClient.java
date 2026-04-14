@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import neoflex.chulkov.dto.LoanOfferDto;
 import neoflex.chulkov.dto.LoanStatementRequestDto;
+import neoflex.chulkov.util.ApiPath;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -26,7 +27,7 @@ public class DealRestClient {
 
         List<LoanOfferDto> offers = restClient
                 .post()
-                .uri("/deal/statement")
+                .uri(ApiPath.DEAL_STATEMENT)
                 .body(requestDto)
                 .contentType(MediaType.APPLICATION_JSON)
                 .retrieve()
@@ -42,7 +43,7 @@ public class DealRestClient {
 
         restClient
                 .post()
-                .uri("/deal/offer/select")
+                .uri(ApiPath.DEAL_OFFER)
                 .body(loanOfferDto)
                 .contentType(MediaType.APPLICATION_JSON)
                 .retrieve()
