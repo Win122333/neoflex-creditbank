@@ -60,7 +60,7 @@ public class DealControllerIT {
                       "passportSeries": "1234",
                       "passportNumber": "567890"
                     }
-                    """, true, true)) // Обрати внимание на массив в birthday
+                    """, true, true))
                 .willReturn(WireMock.ok("""
                     [
                         {
