@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import neoflex.chulkov.dto.ErrorResponseDto;
-import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -23,7 +22,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponseDto> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
         log.warn("Данные не прошли прескоринг: {}", e.getMessage());
         String errors = e.getFieldErrors().stream()
-                .map(DefaultMessageSourceResolvable::getDefaultMessage)
+                .map(x -> x.getField().concat(" ").concat(x.getDefaultMessage()))
                 .collect(Collectors.joining("; "));
 
         ErrorResponseDto response = new ErrorResponseDto(
@@ -34,7 +33,7 @@ public class GlobalExceptionHandler {
     }
     @ExceptionHandler(HttpClientErrorException.class)
     public ResponseEntity<ErrorResponseDto> handleHttpClientErrorException(HttpClientErrorException e) {
-        log.warn("Неправильно введеные данные: {}", e.getMessage());
+        log.warn("Неправильно введенные данные: {}", e.getMessage());
 
         try {
             ErrorResponseDto errorBody = objectMapper.readValue(
