@@ -5,6 +5,56 @@ info:
   version: 1.0.0
 
 paths:
+  /deal/document/{statementId}/send:
+    post:
+      summary: Запрос на отправку документов
+      operationId: sendDocuments
+      tags:
+        - deal
+      parameters:
+        - name: statementId
+          in: path
+          required: true
+          description: ID заявки
+          schema:
+            type: string
+      responses:
+        '201':
+          description: Запрос на отправку документов выполнен
+
+  /deal/document/{statementId}/sign:
+    post:
+      summary: Запрос на подписание документов
+      operationId: signDocuments
+      tags:
+        - deal
+      parameters:
+        - name: statementId
+          in: path
+          required: true
+          description: ID заявки
+          schema:
+            type: string
+      responses:
+        '201':
+          description: Запрос на подписание документов выполнен
+
+  /deal/document/{statementId}/code:
+    post:
+      summary: Подписание документов
+      operationId: codeDocuments
+      tags:
+        - deal
+      parameters:
+        - name: statementId
+          in: path
+          required: true
+          description: ID заявки
+          schema:
+            type: string
+      responses:
+        '201':
+          description: Документы подписаны
   /deal/statement:
     post:
       summary: Расчет списка кредитных предложений
@@ -327,6 +377,22 @@ components:
         - status
         - error
         - message
+    EmailMessage:
+      type: object
+      description: сообщение для кафки
+      properties:
+        emailAddress:
+          type: string
+          example: "ex@mail.ru"
+        theme:
+          $ref: '#/components/schemas/Theme'
+        statementId:
+          type: string
+
+    Theme:
+      description: "Тема письма"
+      type: string
+      enum: [ FINISH_REGISTRATION, CREATE_DOCUMENT, SEND_DOCUMENTS, SEND_SES, CREDIT_ISSUED, STATEMENT_DENIED ]
 
     ApplicationStatus:
       description: "Статус заявки"

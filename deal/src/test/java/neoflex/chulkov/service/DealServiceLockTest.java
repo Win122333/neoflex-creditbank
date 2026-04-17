@@ -1,5 +1,6 @@
 package neoflex.chulkov.service;
 
+import lombok.extern.slf4j.Slf4j;
 import neoflex.chulkov.dto.LoanOfferDto;
 import neoflex.chulkov.dto.enums.ApplicationStatus;
 import neoflex.chulkov.entity.Client;
@@ -25,6 +26,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@Slf4j
 @SpringBootTest
 @ActiveProfiles("test")
 class DealServiceLockTest {
@@ -91,10 +93,8 @@ class DealServiceLockTest {
                     try {
                         dealService.selectOffer(offer);
                         successCount.incrementAndGet();
-                        System.out.println("Thread " + threadNum + " successfully updated statement");
                     } catch (InvalidStatementStatusException e) {
                         failureCount.incrementAndGet();
-                        System.out.println("Thread " + threadNum + " failed: " + e.getMessage());
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -142,7 +142,6 @@ class DealServiceLockTest {
                 dealService.selectOffer(offer1);
 
                 thread1Duration[0] = System.currentTimeMillis() - start;
-                System.out.println("Thread 1 duration: " + thread1Duration[0] + " ms");
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -161,7 +160,6 @@ class DealServiceLockTest {
                 }
 
                 thread2Duration[0] = System.currentTimeMillis() - start;
-                System.out.println("Thread 2 duration: " + thread2Duration[0] + " ms");
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {
@@ -177,9 +175,6 @@ class DealServiceLockTest {
         assertTrue(thread2Duration[0] > thread1Duration[0],
                 "Второй поток должен ждать дольше из-за блокировки. Thread1: " +
                         thread1Duration[0] + "ms, Thread2: " + thread2Duration[0] + "ms");
-
-        System.out.println("Thread 2 waited approximately " +
-                (thread2Duration[0] - thread1Duration[0]) + " ms for lock");
     }
 
     @Test
@@ -197,7 +192,7 @@ class DealServiceLockTest {
                 dealService.selectOffer(createTestOffer(statementId));
                 firstSuccess.incrementAndGet();
             } catch (Exception e) {
-                System.err.println("First transaction failed: " + e.getMessage());
+                log.error("First transaction failed: " + e.getMessage());
             } finally {
                 latch.countDown();
             }
@@ -209,9 +204,9 @@ class DealServiceLockTest {
                 dealService.selectOffer(createTestOffer(statementId));
                 secondSuccess.incrementAndGet();
             } catch (InvalidStatementStatusException e) {
-                System.out.println("Second transaction correctly failed: " + e.getMessage());
+                log.error("Second transaction correctly failed: " + e.getMessage());
             } catch (Exception e) {
-                System.err.println("Second transaction error: " + e.getMessage());
+                log.error("Second transaction error: " + e.getMessage());
             } finally {
                 latch.countDown();
             }

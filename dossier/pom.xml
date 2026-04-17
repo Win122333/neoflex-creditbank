@@ -132,19 +132,19 @@
                                 <serializableModel>true</serializableModel>
                             </configOptions>
 
-                            <typeMappings>
-                                <typeMapping>ApplicationStatus=neoflex.chulkov.dto.enums.ApplicationStatus</typeMapping>
-                                <typeMapping>ChangeType=neoflex.chulkov.dto.enums.ChangeType</typeMapping>
-                                <typeMapping>Gender=neoflex.chulkov.dto.enums.Gender</typeMapping>
-                                <typeMapping>MaritalStatus=neoflex.chulkov.dto.enums.MaritalStatus</typeMapping>
-                            </typeMappings>
+<!--                            <typeMappings>-->
+<!--                                <typeMapping>ApplicationStatus=neoflex.chulkov.dto.enums.ApplicationStatus</typeMapping>-->
+<!--                                <typeMapping>ChangeType=neoflex.chulkov.dto.enums.ChangeType</typeMapping>-->
+<!--                                <typeMapping>Gender=neoflex.chulkov.dto.enums.Gender</typeMapping>-->
+<!--                                <typeMapping>MaritalStatus=neoflex.chulkov.dto.enums.MaritalStatus</typeMapping>-->
+<!--                            </typeMappings>-->
 
-                            <importMappings>
-                                <importMapping>ApplicationStatus=neoflex.chulkov.dto.enums.ApplicationStatus</importMapping>
-                                <importMapping>ChangeType=neoflex.chulkov.dto.enums.ChangeType</importMapping>
-                                <importMapping>Gender=neoflex.chulkov.dto.enums.Gender</importMapping>
-                                <importMapping>MaritalStatus=neoflex.chulkov.dto.enums.MaritalStatus</importMapping>
-                            </importMappings>
+<!--                            <importMappings>-->
+<!--                                <importMapping>ApplicationStatus=neoflex.chulkov.dto.enums.ApplicationStatus</importMapping>-->
+<!--                                <importMapping>ChangeType=neoflex.chulkov.dto.enums.ChangeType</importMapping>-->
+<!--                                <importMapping>Gender=neoflex.chulkov.dto.enums.Gender</importMapping>-->
+<!--                                <importMapping>MaritalStatus=neoflex.chulkov.dto.enums.MaritalStatus</importMapping>-->
+<!--                            </importMappings>-->
                         </configuration>
                     </execution>
                 </executions>

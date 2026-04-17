@@ -15,6 +15,7 @@ import neoflex.chulkov.exception.InvalidStatementStatusException;
 import neoflex.chulkov.exception.ScoringException;
 import neoflex.chulkov.mapper.CreditMapper;
 import neoflex.chulkov.mapper.ScoringDataMapper;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.OffsetDateTime;
@@ -31,6 +32,7 @@ public class DealService {
     private final CreditService creditService;
     private final ScoringDataMapper scoringDataMapper;
     private final CreditMapper creditMapper;
+    private final KafkaTemplate<String, EmailMessage> kafkaTemplate;
 
     @Transactional
     public List<LoanOfferDto> createStatement(LoanStatementRequestDto dto) {

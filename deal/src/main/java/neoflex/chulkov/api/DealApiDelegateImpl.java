@@ -11,11 +11,30 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class DealApiDelegateImpl implements DealApiDelegate {
     private final DealService dealService;
+
+    @Override
+    public ResponseEntity<Void> sendDocuments(String statementId) {
+        log.info("called /deal/document/{statementId}/send with statementId = {}", statementId);
+        return DealApiDelegate.super.sendDocuments(statementId);
+    }
+
+    @Override
+    public ResponseEntity<Void> signDocuments(String statementId) {
+        log.info("called /deal/document/{statementId}/sign with statementId = {}", statementId);
+        return DealApiDelegate.super.signDocuments(statementId);
+    }
+
+    @Override
+    public ResponseEntity<Void> codeDocuments(String statementId) {
+        log.info("called /deal/document/{statementId}/code with statementId = {}", statementId);
+        return DealApiDelegate.super.codeDocuments(statementId);
+    }
 
     @Override
     public ResponseEntity<Void> calculate(

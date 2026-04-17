@@ -105,6 +105,10 @@
             <groupId>org.liquibase</groupId>
             <artifactId>liquibase-core</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.kafka</groupId>
+            <artifactId>spring-kafka</artifactId>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
@@ -156,6 +160,7 @@
                                 <typeMapping>ChangeType=neoflex.chulkov.dto.enums.ChangeType</typeMapping>
                                 <typeMapping>Gender=neoflex.chulkov.dto.enums.Gender</typeMapping>
                                 <typeMapping>MaritalStatus=neoflex.chulkov.dto.enums.MaritalStatus</typeMapping>
+                                <typeMapping>Theme=neoflex.chulkov.dto.enums.Theme</typeMapping>
                             </typeMappings>
 
                             <importMappings>
@@ -163,6 +168,7 @@
                                 <importMapping>ChangeType=neoflex.chulkov.dto.enums.ChangeType</importMapping>
                                 <importMapping>Gender=neoflex.chulkov.dto.enums.Gender</importMapping>
                                 <importMapping>MaritalStatus=neoflex.chulkov.dto.enums.MaritalStatus</importMapping>
+                                <importMapping>Theme=neoflex.chulkov.dto.enums.Theme</importMapping>
                             </importMappings>
                         </configuration>
                     </execution>
