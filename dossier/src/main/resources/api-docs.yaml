@@ -1,0 +1,61 @@
+openapi: 3.0.1
+info:
+  title: API Микросервиса Dossier
+  description: API для отправки писем на почту клиента.
+  version: 1.0.0
+servers:
+  - url: http://localhost:8084
+
+paths:
+  /deal/document/{statementId}:
+    /send:
+      post:
+        summary: Запрос на отправку документов
+        operationId: sendDocuments
+        tags:
+          - dossier
+        parameters:
+          - name: statementId
+            in: path
+            required: true
+            description: ID заявки
+            schema:
+              type: string
+              format: uuid
+        responses:
+          '201':
+            description: Запрос на отправку документов выполнен
+    /sign:
+      post:
+        summary: Запрос на подписание документов
+        operationId: sendSignDocument
+        tags:
+          - dossier
+        parameters:
+          - name: statementId
+            in: path
+            required: true
+            description: ID заявки
+            schema:
+              type: string
+              format: uuid
+        responses:
+          '201':
+            description: Запрос на подписание документов выполнен
+    /code:
+      post:
+        summary: Подписание документов
+        operationId: signDocuments
+        tags:
+          - dossier
+        parameters:
+          - name: statementId
+            in: path
+            required: true
+            description: ID заявки
+            schema:
+              type: string
+              format: uuid
+        responses:
+          '201':
+            description: Документы подписаны
