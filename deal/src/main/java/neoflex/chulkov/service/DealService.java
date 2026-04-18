@@ -15,7 +15,6 @@ import neoflex.chulkov.exception.InvalidStatementStatusException;
 import neoflex.chulkov.exception.ScoringException;
 import neoflex.chulkov.mapper.CreditMapper;
 import neoflex.chulkov.mapper.ScoringDataMapper;
-import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.OffsetDateTime;
@@ -32,7 +31,7 @@ public class DealService {
     private final CreditService creditService;
     private final ScoringDataMapper scoringDataMapper;
     private final CreditMapper creditMapper;
-    private final KafkaTemplate<String, EmailMessage> kafkaTemplate;
+    private final KafkaProducerService kafkaProducerService;
 
     @Transactional
     public List<LoanOfferDto> createStatement(LoanStatementRequestDto dto) {
@@ -80,6 +79,16 @@ public class DealService {
                         ChangeType.AUTOMATIC
                 ));
         statementService.saveStatement(statement);
+
+        Client client = statement.getClient();
+        EmailMessage messageToMail = new EmailMessage()
+                .firstName(client.getFirstName())
+                .lastName(client.getLastName())
+                .middleName(client.getMiddleName())
+                .email(client.getEmail())
+                .statementId(statement.getStatementId().toString())
+                .birthday(client.getBirthDate());
+        kafkaProducerService.sendFinishRegistrationMessage(messageToMail);
 
         log.info("Предложение успешно применено. Статус заявки {} обновлен на {}", dto.getStatementId(), ApplicationStatus.APPROVED);
     }

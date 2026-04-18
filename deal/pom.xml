@@ -160,7 +160,7 @@
                                 <typeMapping>ChangeType=neoflex.chulkov.dto.enums.ChangeType</typeMapping>
                                 <typeMapping>Gender=neoflex.chulkov.dto.enums.Gender</typeMapping>
                                 <typeMapping>MaritalStatus=neoflex.chulkov.dto.enums.MaritalStatus</typeMapping>
-                                <typeMapping>Theme=neoflex.chulkov.dto.enums.Theme</typeMapping>
+<!--                                <typeMapping>Theme=neoflex.chulkov.dto.enums.Theme</typeMapping>-->
                             </typeMappings>
 
                             <importMappings>
@@ -168,7 +168,7 @@
                                 <importMapping>ChangeType=neoflex.chulkov.dto.enums.ChangeType</importMapping>
                                 <importMapping>Gender=neoflex.chulkov.dto.enums.Gender</importMapping>
                                 <importMapping>MaritalStatus=neoflex.chulkov.dto.enums.MaritalStatus</importMapping>
-                                <importMapping>Theme=neoflex.chulkov.dto.enums.Theme</importMapping>
+<!--                                <importMapping>Theme=neoflex.chulkov.dto.enums.Theme</importMapping>-->
                             </importMappings>
                         </configuration>
                     </execution>

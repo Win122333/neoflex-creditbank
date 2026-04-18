@@ -381,18 +381,33 @@ components:
       type: object
       description: сообщение для кафки
       properties:
-        emailAddress:
+        firstName:
           type: string
-          example: "ex@mail.ru"
-        theme:
-          $ref: '#/components/schemas/Theme'
+          pattern: '^[a-zA-Z]{2,30}?$'
+          description: "Имя (2 - 30 латинских символов)"
+        lastName:
+          type: string
+          pattern: '^[a-zA-Z]{2,30}?$'
+        middleName:
+          type: string
+          pattern: '^[a-zA-Z]{2,30}?$'
+        email:
+          type: string
+          format: email
+          pattern: "^[a-z0-9A-Z_!#$%&'*+/=?`{|}~^.-]+@[a-z0-9A-Z.-]+$"
+        birthday:
+          type: string
+          format: date
+          description: "Дата рождения (должна быть в прошлом, возраст >= 18 лет)"
         statementId:
           type: string
 
-    Theme:
-      description: "Тема письма"
-      type: string
-      enum: [ FINISH_REGISTRATION, CREATE_DOCUMENT, SEND_DOCUMENTS, SEND_SES, CREDIT_ISSUED, STATEMENT_DENIED ]
+
+
+#    Theme:
+#      description: "Тема письма"
+#      type: string
+#      enum: [ FINISH_REGISTRATION, CREATE_DOCUMENT, SEND_DOCUMENTS, SEND_SES, CREDIT_ISSUED, STATEMENT_DENIED ]
 
     ApplicationStatus:
       description: "Статус заявки"
