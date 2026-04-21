@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px; }
+        .container { background-color: #ffffff; padding: 30px; border-radius: 8px; max-width: 600px; margin: auto; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        /* Красный/бордовый акцент для статуса отказа */
+        .header { color: #c0392b; border-bottom: 2px solid #e74c3c; padding-bottom: 10px; }
+        .footer { margin-top: 30px; font-size: 12px; color: #7f8c8d; text-align: center; }
+
+        /* Стили для блока с текстом отказа */
+        .denied-box { background-color: #fdedec; border-left: 4px solid #e74c3c; padding: 15px; margin: 20px 0; font-size: 15px; color: #2c3e50; line-height: 1.5; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2 class="header">Решение по кредитной заявке</h2>
+
+    <p th:text="|Здравствуйте, ${client.firstName} ${client.lastName}!|"></p>
+
+    <p>Мы внимательно рассмотрели вашу заявку на получение кредита.</p>
+
+    <div class="denied-box">
+        К сожалению, на данный момент банк <strong>не может одобрить</strong> выдачу кредита на запрошенных условиях.
+        <br><br>
+        <i>Обычно это связано с результатами автоматической проверки скоринга, вашей текущей кредитной нагрузкой или историей в БКИ. Банк не раскрывает точных причин отказа согласно внутренней политике.</i>
+    </div>
+
+    <p>Номер вашей заявки: <strong th:text="${client.statementId}">000000</strong></p>
+
+    <p>Вы можете попробовать подать новую заявку, изменив желаемую сумму или срок, через 30 дней. Спасибо, что обратились к нам!</p>
+
+    <div class="footer">
+        <p>С уважением, Ваш кредитный Банк</p>
+    </div>
+</div>
+</body>
+</html>

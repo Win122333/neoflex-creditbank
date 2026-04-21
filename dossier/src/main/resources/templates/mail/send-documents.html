@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px; }
+        .container { background-color: #ffffff; padding: 30px; border-radius: 8px; max-width: 600px; margin: auto; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        .header { color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px; }
+        .button { display: inline-block; padding: 12px 24px; background-color: #3498db; color: #ffffff; text-decoration: none; border-radius: 5px; margin-top: 20px; font-weight: bold; }
+        .footer { margin-top: 30px; font-size: 12px; color: #7f8c8d; text-align: center; }
+        .info-block { background-color: #ebf5fb; border-left: 4px solid #3498db; padding: 15px; margin: 20px 0; color: #2c3e50; }
+        .doc-item { margin: 5px 0; font-size: 14px; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2 class="header">Ваши кредитные документы готовы</h2>
+
+    <p th:text="|Здравствуйте, ${client.firstName} ${client.lastName}!|"></p>
+
+    <p>Мы подготовили полный пакет документов по вашей кредитной заявке. Пожалуйста, ознакомьтесь с условиями договора и графиком платежей.</p>
+
+    <div class="info-block">
+        <strong>Состав пакета документов:</strong>
+        <div class="doc-item">📄 Кредитный договор</div>
+        <div class="doc-item">📄 График ежемесячных платежей</div>
+        <div class="doc-item">📄 Условия страхования (если применимо)</div>
+    </div>
+
+    <p>Номер вашей заявки: <strong th:text="${client.statementId}">000000</strong></p>
+
+    <p>Если вы согласны с предложенными условиями, нажмите кнопку ниже. После этого на вашу почту будет выслан секретный код для электронного подписания документов.</p>
+
+    <form th:action="@{'http://localhost:8082/deal/document/' + ${client.statementId} + '/sign'}" method="post">
+        <button type="submit" class="button" style="border: none; cursor: pointer;">
+            Согласен, подписать документы
+        </button>
+    </form>
+
+    <div class="footer">
+        <p>С уважением, Ваш кредитный Банк</p>
+    </div>
+</div>
+</body>
+</html>

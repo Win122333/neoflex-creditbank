@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px; }
+        .container { background-color: #ffffff; padding: 30px; border-radius: 8px; max-width: 600px; margin: auto; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        /* Зеленый акцент для успешного статуса */
+        .header { color: #27ae60; border-bottom: 2px solid #2ecc71; padding-bottom: 10px; }
+        .footer { margin-top: 30px; font-size: 12px; color: #7f8c8d; text-align: center; }
+
+        /* Стили для блока успешного завершения */
+        .success-box { background-color: #eafaf1; border-left: 4px solid #2ecc71; padding: 15px; margin: 20px 0; font-size: 15px; color: #2c3e50; line-height: 1.5; }
+        .highlight { color: #27ae60; font-weight: bold; font-size: 18px; display: block; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2 class="header">Кредит успешно выдан</h2>
+
+    <p th:text="|Здравствуйте, ${client.firstName} ${client.lastName}!|"></p>
+
+    <p>Поздравляем! Ваша заявка успешно завершена, а кредитные документы подписаны с помощью электронной подписи.</p>
+
+    <div class="success-box">
+        <span class="highlight">✓ Денежные средства переведены на ваш счет</span>
+        В зависимости от вашего банка, зачисление может занять от нескольких минут до одного рабочего дня. График платежей и копия договора остаются актуальными согласно предыдущим письмам.
+    </div>
+
+    <p>Номер вашего договора (заявки): <strong th:text="${client.statementId}">000000</strong></p>
+
+    <p>Спасибо, что выбрали нас. Желаем отличного дня и успешных финансовых свершений!</p>
+
+    <div class="footer">
+        <p>С уважением, Ваш кредитный Банк</p>
+    </div>
+</div>
+</body>
+</html>

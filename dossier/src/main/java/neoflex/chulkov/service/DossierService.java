@@ -19,14 +19,52 @@ public class DossierService {
     public void consumeFinishRegistration(EmailMessage message, Acknowledgment acknowledgment) {
         log.info("Получено сообщение из Kafka finish-registration,  {}", message);
 
+        sendMail("mail/finish-registration", message, acknowledgment, Theme.FINISH_REGISTRATION);
+    }
+    @KafkaListener(topics = "create-documents")
+    public void consumeCreateDocuments(EmailMessage message, Acknowledgment acknowledgment) {
+        log.info("Получено сообщение из Kafka create-documents,  {}", message);
+
+        sendMail("mail/create-documents", message, acknowledgment, Theme.CREATE_DOCUMENT);
+    }
+    @KafkaListener(topics = "send-documents")
+    public void consumeSendDocuments(EmailMessage message, Acknowledgment acknowledgment) {
+        log.info("Получено сообщение из Kafka send-documents: {}", message);
+
+        sendMail("mail/send-documents", message, acknowledgment, Theme.SEND_DOCUMENTS);
+    }
+    @KafkaListener(topics = "create-ses")
+    public void consumeSendSes(EmailMessage message, Acknowledgment acknowledgment) {
+        log.info("Получено сообщение из Kafka create-ses: {}", message);
+
+        sendMail("mail/sing-ses-documents", message, acknowledgment, Theme.SEND_SES);
+    }
+    @KafkaListener(topics = "credit-issued")
+    public void consumeCreditIssued(EmailMessage message, Acknowledgment acknowledgment) {
+        log.info("Получено сообщение из Kafka credit-issued: {}", message);
+
+        sendMail("mail/credit-issued", message, acknowledgment, Theme.CREDIT_ISSUED);
+    }
+    @KafkaListener(topics = "statement-denied")
+    public void consumeStatementDenied(EmailMessage message, Acknowledgment acknowledgment) {
+        log.info("Получено сообщение из Kafka statement-denied: {}", message);
+
+        sendMail("mail/statement-denied", message, acknowledgment, Theme.STATEMENT_DENIED);
+    }
+    private void sendMail(
+            String htmlTemplate,
+            EmailMessage message,
+            Acknowledgment acknowledgment,
+            Theme theme
+    ) {
         Context context = new Context();
         context.setVariable("client",message);
 
         try {
             mailSenderService.send(
                     message,
-                    Theme.FINISH_REGISTRATION.getTitle(),
-                    "finish-registration",
+                    theme.getTitle(),
+                    htmlTemplate,
                     context
             );
             acknowledgment.acknowledge();
@@ -36,74 +74,4 @@ public class DossierService {
             throw e;
         }
     }
-//    @KafkaListener(topics = "create-documents")
-//    public void consumeCreateDocuments(EmailMessage message) {
-//        log.info("Получено сообщение из Kafka create-documents: {}", message);
-//
-//        Context context = new Context();
-//        context.setVariable("mail", message.statementId());
-//
-//        mailSenderService.send(
-//                message.emailAddress(),
-//                "Завершение оформления кредита",
-//                "email/finish-registration",
-//                context
-//        );
-//    }
-//    @KafkaListener(topics = "send-documents")
-//    public void consumeSendDocuments(EmailMessage message) {
-//        log.info("Получено сообщение из Kafka send-documents: {}", message);
-//
-//        Context context = new Context();
-//        context.setVariable("mail", message.statementId());
-//
-//        mailSenderService.send(
-//                message.emailAddress(),
-//                "Завершение оформления кредита",
-//                "email/finish-registration",
-//                context
-//        );
-//    }
-//    @KafkaListener(topics = "create-ses")
-//    public void consumeSendSes(EmailMessage message) {
-//        log.info("Получено сообщение из Kafka create-ses: {}", message);
-//
-//        Context context = new Context();
-//        context.setVariable("mail", message.statementId());
-//
-//        mailSenderService.send(
-//                message.emailAddress(),
-//                "Завершение оформления кредита",
-//                "email/finish-registration",
-//                context
-//        );
-//    }
-//    @KafkaListener(topics = "credit-issued")
-//    public void consumeCreditIssued(EmailMessage message) {
-//        log.info("Получено сообщение из Kafka credit-issued: {}", message);
-//
-//        Context context = new Context();
-//        context.setVariable("mail", message.statementId());
-//
-//        mailSenderService.send(
-//                message.emailAddress(),
-//                "Завершение оформления кредита",
-//                "email/finish-registration",
-//                context
-//        );
-//    }
-//    @KafkaListener(topics = "statement-denied")
-//    public void consumeStatementDenied(EmailMessage message) {
-//        log.info("Получено сообщение из Kafka statement-denied: {}", message);
-//
-//        Context context = new Context();
-//        context.setVariable("mail", message.statementId());
-//
-//        mailSenderService.send(
-//                message.emailAddress(),
-//                "Завершение оформления кредита",
-//                "email/finish-registration",
-//                context
-//        );
-//    }
 }

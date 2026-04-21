@@ -6,7 +6,7 @@ import neoflex.chulkov.dto.FinishRegistrationRequestDto;
 import neoflex.chulkov.dto.LoanOfferDto;
 import neoflex.chulkov.dto.LoanStatementRequestDto;
 import neoflex.chulkov.service.DealService;
-import neoflex.chulkov.service.NotificationService;
+import neoflex.chulkov.service.DocumentService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -18,7 +18,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class DealApiDelegateImpl implements DealApiDelegate {
     private final DealService dealService;
-    private final NotificationService notificationService;
+    private final DocumentService documentService;
 
     @Override
     public ResponseEntity<Void> sendDocuments(String statementId) {

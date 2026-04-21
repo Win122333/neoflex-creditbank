@@ -29,19 +29,19 @@ public class KafkaProducerService {
     @Value("${deal.kafka.topic.statement-denied:statement-denied}")
     private String statementDeniedTopic;
 
-    public void sendFinishRegistrationMessage(EmailMessage message) {
+    public void sendFinishRegistration(EmailMessage message) {
         log.info("отправлено в kafka " + finishRegistrationTopic + " topic");
         CompletableFuture<SendResult<String, EmailMessage>> future =
                 kafkaTemplate.send(finishRegistrationTopic, message.getStatementId(), message);
         future.whenComplete(handleCallbacks(message.getStatementId()));
     }
-    public void sendCreateDocumentsMessage(EmailMessage message) {
+    public void sendCreateDocuments(EmailMessage message) {
         log.info("отправлено в kafka " + createDocumentsTopic + " topic");
         CompletableFuture<SendResult<String, EmailMessage>> future =
                 kafkaTemplate.send(createDocumentsTopic, message.getStatementId(), message);
         future.whenComplete(handleCallbacks(message.getStatementId()));
     }
-    public void sendSesTopic(EmailMessage message) {
+    public void sendSes(EmailMessage message) {
         log.info("отправлено в kafka " + sesTopic + " topic");
         CompletableFuture<SendResult<String, EmailMessage>> future =
                 kafkaTemplate.send(sesTopic, message.getStatementId(), message);
@@ -57,6 +57,12 @@ public class KafkaProducerService {
         log.info("отправлено в kafka " + creditIssuedTopic + " topic");
         CompletableFuture<SendResult<String, EmailMessage>> future =
                 kafkaTemplate.send(creditIssuedTopic, message.getStatementId(), message);
+        future.whenComplete(handleCallbacks(message.getStatementId()));
+    }
+    public void sendDocuments(EmailMessage message) {
+        log.info("отправлено в kafka " + sendDocumentsTopic + " topic");
+        CompletableFuture<SendResult<String, EmailMessage>> future =
+                kafkaTemplate.send(sendDocumentsTopic, message.getStatementId(), message);
         future.whenComplete(handleCallbacks(message.getStatementId()));
     }
     private BiConsumer<SendResult<String, EmailMessage>, Throwable> handleCallbacks(String id) {

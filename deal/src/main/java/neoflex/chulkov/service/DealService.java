@@ -88,7 +88,7 @@ public class DealService {
                 .email(client.getEmail())
                 .statementId(statement.getStatementId().toString())
                 .birthday(client.getBirthDate());
-        kafkaProducerService.sendFinishRegistrationMessage(messageToMail);
+        kafkaProducerService.sendFinishRegistration(messageToMail);
 
         log.info("Предложение успешно применено. Статус заявки {} обновлен на {}", dto.getStatementId(), ApplicationStatus.APPROVED);
     }
@@ -98,6 +98,14 @@ public class DealService {
         log.info("Начало завершения регистрации и расчета кредита для заявки ID: {}", statementId);
 
         Statement statement = statementService.getStatementById(UUID.fromString(statementId));
+        Client client = statement.getClient();
+        EmailMessage emailMessage = new EmailMessage()
+                .birthday(client.getBirthDate())
+                .firstName(client.getFirstName())
+                .lastName(client.getLastName())
+                .middleName(client.getMiddleName())
+                .statementId(statementId)
+                .email(client.getEmail());
 
         if(statement.getStatus() != ApplicationStatus.APPROVED) {
             log.warn("Отказ в расчете: заявка {} находится в неверном статусе {}", statementId, statement.getStatus());
@@ -131,7 +139,8 @@ public class DealService {
                     )
             );
             statementService.saveStatement(statement);
-            log.info("Заявка {} успешно прошла скоринг", statementId);
+            kafkaProducerService.sendCreateDocuments(emailMessage);
+            log.info("Заявка {} успешно прошла скоринг и данные отправлены в topic create-documents", statementId);
         }
         catch (ScoringException e) {
             log.warn("Отказ по заявке {}: {}", statementId, e.getMessage());
@@ -142,6 +151,7 @@ public class DealService {
                     ChangeType.AUTOMATIC
             ));
             statementService.saveStatement(statement);
+            kafkaProducerService.sendStatementDenied(emailMessage);
             log.info("Статус заявки {} изменен на CC_DENIED из-за отказа скоринга", statementId);
         }
     }

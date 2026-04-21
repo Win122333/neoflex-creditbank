@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px; }
+        .container { background-color: #ffffff; padding: 30px; border-radius: 8px; max-width: 600px; margin: auto; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        .header { color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px; }
+        .button { display: inline-block; padding: 12px 24px; background-color: #3498db; color: #ffffff; text-decoration: none; border-radius: 5px; margin-top: 20px; font-size: 16px; font-weight: bold; }
+        .footer { margin-top: 30px; font-size: 12px; color: #7f8c8d; text-align: center; }
+
+        /* Стили для красивого отображения ПИН-кода */
+        .ses-code-box { background-color: #fdf2e9; border: 1px dashed #e67e22; border-radius: 5px; padding: 15px; text-align: center; margin: 20px 0; }
+        .ses-code { font-size: 32px; font-weight: bold; color: #d35400; letter-spacing: 5px; }
+
+        /* Стили для поля ввода */
+        .input-field { padding: 12px; font-size: 16px; border: 1px solid #ccc; border-radius: 4px; width: 100%; max-width: 250px; margin-top: 10px; box-sizing: border-box; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2 class="header">Электронная подпись документов</h2>
+
+    <p th:text="|Здравствуйте, ${client.firstName} ${client.lastName}!|"></p>
+
+    <p>Вы инициировали процесс подписания кредитных документов. Ниже указан ваш одноразовый секретный код (SES-код), который является аналогом вашей собственноручной подписи.</p>
+
+    <div class="ses-code-box">
+        <p style="margin: 0 0 10px 0; font-size: 14px; color: #7f8c8d;">Ваш код подтверждения:</p>
+        <div class="ses-code" th:text="${client.sesCode}">1234</div>
+    </div>
+
+    <p>Номер вашей заявки: <strong th:text="${client.statementId}">000000</strong></p>
+
+    <p>Для подписания документов и завершения сделки, пожалуйста, введите код ниже:</p>
+
+    <form th:action="@{'http://localhost:8082/deal/document/' + ${client.statementId} + '/sign/code'}" method="post">
+        <input type="text" name="code" class="input-field" placeholder="Введите код" required>
+        <br>
+        <button type="submit" class="button" style="border: none; cursor: pointer;">
+            Подписать документы
+        </button>
+    </form>
+
+    <div class="footer">
+        <p>С уважением, Ваш кредитный Банк</p>
+    </div>
+</div>
+</body>
+</html>
