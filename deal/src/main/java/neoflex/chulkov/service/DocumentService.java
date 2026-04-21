@@ -7,6 +7,7 @@ import neoflex.chulkov.dto.EmailMessage;
 import neoflex.chulkov.dto.enums.ApplicationStatus;
 import neoflex.chulkov.entity.Client;
 import neoflex.chulkov.entity.Statement;
+import neoflex.chulkov.mapper.EmailMessageMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -17,6 +18,7 @@ import java.util.UUID;
 public class DocumentService {
     private final ClientService clientService;
     private final StatementService statementService;
+    private final EmailMessageMapper emailMessageMapper;
     private final KafkaProducerService kafkaProducerService;
 
     @Transactional
@@ -27,44 +29,30 @@ public class DocumentService {
         log.info("статус заявки изменен на PREPARE_DOCUMENTS");
 
         Client client = statement.getClient();
-        kafkaProducerService.sendDocuments(
-                new EmailMessage()
-                        .statementId(statementId)
-                        .firstName(client.getFirstName())
-                        .lastName(client.getLastName())
-                        .middleName(client.getMiddleName())
-                        .email(client.getEmail())
-                        .birthday(client.getBirthDate())
-        );
+        EmailMessage message = emailMessageMapper.messageFromClient(client);
+        message.setStatementId(statementId);
+
+        kafkaProducerService.sendDocuments(message);
         log.info("Отправлено сообщение в топик send-documents");
     }
 
     public void signDocument(String statementId) {
         Statement statement = statementService.getStatementById(UUID.fromString(statementId));
         Client client = statement.getClient();
-        kafkaProducerService.sendSes(
-                new EmailMessage()
-                        .statementId(statementId)
-                        .firstName(client.getFirstName())
-                        .lastName(client.getLastName())
-                        .middleName(client.getMiddleName())
-                        .email(client.getEmail())
-                        .birthday(client.getBirthDate())
-        );
+        EmailMessage message = emailMessageMapper.messageFromClient(client);
+        message.setStatementId(statementId);
+
+        kafkaProducerService.sendSes(message);
         log.info("Отправлено сообщение в топик send-ses");
     }
 
     public void verifySesCode(String statementId) {
         Statement statement = statementService.getStatementById(UUID.fromString(statementId));
         Client client = statement.getClient();
-        kafkaProducerService.sendCreditIssued(
-                new EmailMessage()
-                        .statementId(statementId)
-                        .firstName(client.getFirstName())
-                        .lastName(client.getLastName())
-                        .middleName(client.getMiddleName())
-                        .email(client.getEmail())
-                        .birthday(client.getBirthDate()));
+        EmailMessage message = emailMessageMapper.messageFromClient(client);
+        message.setStatementId(statementId);
+
+        kafkaProducerService.sendCreditIssued(message);
         log.info("Отправлено сообщение в топик credit-issued");
     }
 }

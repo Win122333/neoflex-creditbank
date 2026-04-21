@@ -14,6 +14,7 @@ import neoflex.chulkov.entity.Statement;
 import neoflex.chulkov.exception.InvalidStatementStatusException;
 import neoflex.chulkov.exception.ScoringException;
 import neoflex.chulkov.mapper.CreditMapper;
+import neoflex.chulkov.mapper.EmailMessageMapper;
 import neoflex.chulkov.mapper.ScoringDataMapper;
 import org.springframework.stereotype.Service;
 
@@ -32,6 +33,7 @@ public class DealService {
     private final ScoringDataMapper scoringDataMapper;
     private final CreditMapper creditMapper;
     private final KafkaProducerService kafkaProducerService;
+    private final EmailMessageMapper emailMessageMapper;
 
     @Transactional
     public List<LoanOfferDto> createStatement(LoanStatementRequestDto dto) {
@@ -80,14 +82,12 @@ public class DealService {
                 ));
         statementService.saveStatement(statement);
 
+
         Client client = statement.getClient();
-        EmailMessage messageToMail = new EmailMessage()
-                .firstName(client.getFirstName())
-                .lastName(client.getLastName())
-                .middleName(client.getMiddleName())
-                .email(client.getEmail())
-                .statementId(statement.getStatementId().toString())
-                .birthday(client.getBirthDate());
+        EmailMessage messageToMail = emailMessageMapper.messageFromClient(client);
+        messageToMail.setStatementId(statement.getStatementId().toString());
+
+
         kafkaProducerService.sendFinishRegistration(messageToMail);
 
         log.info("Предложение успешно применено. Статус заявки {} обновлен на {}", dto.getStatementId(), ApplicationStatus.APPROVED);
@@ -98,14 +98,6 @@ public class DealService {
         log.info("Начало завершения регистрации и расчета кредита для заявки ID: {}", statementId);
 
         Statement statement = statementService.getStatementById(UUID.fromString(statementId));
-        Client client = statement.getClient();
-        EmailMessage emailMessage = new EmailMessage()
-                .birthday(client.getBirthDate())
-                .firstName(client.getFirstName())
-                .lastName(client.getLastName())
-                .middleName(client.getMiddleName())
-                .statementId(statementId)
-                .email(client.getEmail());
 
         if(statement.getStatus() != ApplicationStatus.APPROVED) {
             log.warn("Отказ в расчете: заявка {} находится в неверном статусе {}", statementId, statement.getStatus());
@@ -118,6 +110,12 @@ public class DealService {
         ScoringDataDto scoringData = scoringDataMapper.toScoringDataDto(statement, dto);
         log.debug("calculateCredit with scoringData = {}", scoringData);
         log.info("Отправка данных на скоринг в калькулятор для заявки {}", statementId);
+
+
+        Client client = statement.getClient();
+        EmailMessage emailMessage = emailMessageMapper.messageFromClient(client);
+        emailMessage.setStatementId(statementId);
+
 
         try{
             CreditDto creditDto = calculatorRestClient.getCredit(scoringData);

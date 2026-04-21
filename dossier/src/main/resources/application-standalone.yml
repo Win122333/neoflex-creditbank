@@ -3,14 +3,14 @@ dossier:
     bootstrap: localhost:29092,localhost:39092,localhost:49092
 spring:
   mail:
-    port: 2525
-    username: a7f7578095d0e3
-    password: c87921bee36855
-    host: sandbox.smtp.mailtrap.io
+    port: 587
+    username: ${MAIL_LOGIN}
+    password: ${MAIL_PASSWORD}
+    host: smtp.mail.ru
     properties:
       mail:
-        smth:
-          auth: true
         smtp:
+          auth: true
           starttls:
             enable: true
+            required: true

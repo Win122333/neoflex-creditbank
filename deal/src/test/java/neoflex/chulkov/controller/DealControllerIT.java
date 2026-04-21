@@ -3,7 +3,6 @@ package neoflex.chulkov.controller;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import jakarta.transaction.Transactional;
-import neoflex.chulkov.DealApplication;
 import neoflex.chulkov.dto.LoanStatementRequestDto;
 import neoflex.chulkov.dto.enums.ApplicationStatus;
 import neoflex.chulkov.dto.enums.CreditStatus;
@@ -24,7 +23,6 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.List;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -100,7 +98,7 @@ public class DealControllerIT {
 
         var client = clients.get(0);
         var statement = statements.get(0);
-        assertEquals(LocalDate.parse("1995-03-23"), client.getBirthDate());
+        assertEquals(LocalDate.parse("1995-03-23"), client.getBirthday());
         assertEquals("Vlad", client.getFirstName());
         assertEquals("Simonyan", client.getLastName());
         assertEquals("Igorevich", client.getMiddleName());

@@ -51,7 +51,7 @@ class DealServiceLockTest {
         client.setFirstName("Test");
         client.setLastName("User");
         client.setEmail("test@example.com");
-        client.setBirthDate(LocalDate.of(1990, 1, 1));
+        client.setBirthday(LocalDate.of(1990, 1, 1));
         client = clientRepository.save(client);
 
         Statement statement = new Statement();
