@@ -147,6 +147,7 @@ public class DealService {
             statementService.saveStatement(statement);
             kafkaProducerService.sendStatementDenied(emailMessage);
             log.info("Статус заявки {} изменен на CC_DENIED из-за отказа скоринга", statementId);
+            throw new ScoringException(e.getMessage());
         }
     }
 }

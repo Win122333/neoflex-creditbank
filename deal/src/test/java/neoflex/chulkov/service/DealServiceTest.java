@@ -4,7 +4,6 @@ import neoflex.chulkov.client.CalculatorRestClient;
 import neoflex.chulkov.dto.*;
 import neoflex.chulkov.dto.enums.ApplicationStatus;
 import neoflex.chulkov.dto.enums.CreditStatus;
-import neoflex.chulkov.dto.enums.ScoringError;
 import neoflex.chulkov.entity.Client;
 import neoflex.chulkov.entity.Credit;
 import neoflex.chulkov.entity.Statement;
@@ -20,7 +19,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
