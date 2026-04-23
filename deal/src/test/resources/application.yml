@@ -1,4 +1,5 @@
 spring:
+  allow-bean-definition-overriding: true
   liquibase:
     change-log: db/changelog/changelog-master.xml
   datasource:

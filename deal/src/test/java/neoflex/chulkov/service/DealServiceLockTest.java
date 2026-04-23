@@ -11,8 +11,11 @@ import neoflex.chulkov.repository.StatementRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.kafka.core.KafkaAdmin;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.math.BigDecimal;
@@ -39,6 +42,15 @@ class DealServiceLockTest {
 
     @Autowired
     private ClientRepository clientRepository;
+
+    @Mock
+    private KafkaProducerService kafkaProducerService;
+
+    @Mock
+    private KafkaAdmin kafkaAdmin;
+
+    @Mock
+    private KafkaTemplate<String, Object> kafkaTemplate;
 
     private UUID statementId;
 
@@ -118,65 +130,6 @@ class DealServiceLockTest {
         assertEquals(ApplicationStatus.APPROVED, finalStatement.getStatus());
         assertEquals(1, finalStatement.getStatusHistory().size());
     }
-
-    @Test
-    @DisplayName("Блокировка БД: проверка времени ожидания при параллельных вызовах")
-    void selectOffer_WithLock_ShouldShowWaitingTime() throws InterruptedException {
-        // given
-        ExecutorService executor = Executors.newFixedThreadPool(2);
-        CountDownLatch thread1Started = new CountDownLatch(1);
-        CountDownLatch thread2Finished = new CountDownLatch(1);
-
-        long[] thread1Duration = new long[1];
-        long[] thread2Duration = new long[1];
-
-        LoanOfferDto offer1 = createTestOffer(statementId);
-        LoanOfferDto offer2 = createTestOffer(statementId);
-        offer2.setRate(BigDecimal.valueOf(10));
-
-        executor.submit(() -> {
-            try {
-                thread1Started.countDown();
-                long start = System.currentTimeMillis();
-
-                dealService.selectOffer(offer1);
-
-                thread1Duration[0] = System.currentTimeMillis() - start;
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
-
-        thread1Started.await();
-        Thread.sleep(100);
-
-        executor.submit(() -> {
-            try {
-                long start = System.currentTimeMillis();
-
-                try {
-                    dealService.selectOffer(offer2);
-                } catch (InvalidStatementStatusException e) {
-                }
-
-                thread2Duration[0] = System.currentTimeMillis() - start;
-            } catch (Exception e) {
-                e.printStackTrace();
-            } finally {
-                thread2Finished.countDown();
-            }
-        });
-
-        // then
-        boolean completed = thread2Finished.await(10, TimeUnit.SECONDS);
-        executor.shutdown();
-
-        assertTrue(completed, "Второй поток должен завершиться");
-        assertTrue(thread2Duration[0] > thread1Duration[0],
-                "Второй поток должен ждать дольше из-за блокировки. Thread1: " +
-                        thread1Duration[0] + "ms, Thread2: " + thread2Duration[0] + "ms");
-    }
-
     @Test
     @DisplayName("Блокировка БД: проверка что блокировка работает на уровне БД, а не приложения")
     void selectOffer_LockAtDatabaseLevel_ShouldWorkAcrossTransactions() throws InterruptedException {

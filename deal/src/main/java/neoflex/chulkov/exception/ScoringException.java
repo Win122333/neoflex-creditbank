@@ -10,4 +10,7 @@ public class ScoringException extends RuntimeException {
         super(msg.getMessage());
         err = msg;
     }
+    public ScoringException(String msg) {
+        super(msg);
+    }
 }

@@ -10,6 +10,7 @@ import neoflex.chulkov.entity.Credit;
 import neoflex.chulkov.entity.Statement;
 import neoflex.chulkov.exception.ScoringException;
 import neoflex.chulkov.mapper.CreditMapper;
+import neoflex.chulkov.mapper.EmailMessageMapper;
 import neoflex.chulkov.mapper.ScoringDataMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -30,13 +31,14 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class DealServiceTest {
-
     @Mock private CalculatorRestClient calculatorRestClient;
     @Mock private ClientService clientService;
     @Mock private StatementService statementService;
     @Mock private CreditService creditService;
     @Mock private ScoringDataMapper scoringDataMapper;
     @Mock private CreditMapper creditMapper;
+    @Mock private EmailMessageMapper emailMessageMapper;
+    @Mock private KafkaProducerService kafkaProducerService;
 
     @InjectMocks
     private DealService dealService;
@@ -104,6 +106,7 @@ class DealServiceTest {
         when(scoringDataMapper.toScoringDataDto(eq(mockStatement), any())).thenReturn(scoringData);
         when(calculatorRestClient.getCredit(scoringData)).thenReturn(creditDto);
         when(creditMapper.toCredit(creditDto)).thenReturn(creditEntity);
+        when(emailMessageMapper.createEmailMessageDto(any(Client.class), anyString())).thenReturn(new EmailMessage());
 
         dealService.calculateCredit(requestDto, id.toString());
 
@@ -122,7 +125,7 @@ class DealServiceTest {
 
         when(statementService.getStatementById(id)).thenReturn(mockStatement);
         when(scoringDataMapper.toScoringDataDto(any(), any())).thenReturn(new ScoringDataDto());
-
+        when(emailMessageMapper.createEmailMessageDto(any(Client.class), anyString())).thenReturn(new EmailMessage());
         when(calculatorRestClient.getCredit(any())).thenThrow(new ScoringException(ScoringError.BAD_AGE));
 
         dealService.calculateCredit(requestDto, id.toString());

@@ -18,8 +18,8 @@ import java.util.UUID;
 public class DocumentService {
     private final ClientService clientService;
     private final StatementService statementService;
-    private final EmailMessageMapper emailMessageMapper;
     private final KafkaProducerService kafkaProducerService;
+    private final EmailMessageMapper emailMessageMapper;
 
     @Transactional
     public void sendDocuments(String statementId) {
@@ -29,8 +29,7 @@ public class DocumentService {
         log.info("статус заявки изменен на PREPARE_DOCUMENTS");
 
         Client client = statement.getClient();
-        EmailMessage message = emailMessageMapper.messageFromClient(client);
-        message.setStatementId(statementId);
+        EmailMessage message = emailMessageMapper.createEmailMessageDto(client, statementId);
 
         kafkaProducerService.sendDocuments(message);
         log.info("Отправлено сообщение в топик send-documents");
@@ -39,8 +38,7 @@ public class DocumentService {
     public void signDocument(String statementId) {
         Statement statement = statementService.getStatementById(UUID.fromString(statementId));
         Client client = statement.getClient();
-        EmailMessage message = emailMessageMapper.messageFromClient(client);
-        message.setStatementId(statementId);
+        EmailMessage message = emailMessageMapper.createEmailMessageDto(client, statementId);
 
         kafkaProducerService.sendSes(message);
         log.info("Отправлено сообщение в топик send-ses");
@@ -49,8 +47,7 @@ public class DocumentService {
     public void verifySesCode(String statementId) {
         Statement statement = statementService.getStatementById(UUID.fromString(statementId));
         Client client = statement.getClient();
-        EmailMessage message = emailMessageMapper.messageFromClient(client);
-        message.setStatementId(statementId);
+        EmailMessage message = emailMessageMapper.createEmailMessageDto(client, statementId);
 
         kafkaProducerService.sendCreditIssued(message);
         log.info("Отправлено сообщение в топик credit-issued");

@@ -5,9 +5,11 @@ import neoflex.chulkov.dto.CreditDto;
 import neoflex.chulkov.dto.LoanOfferDto;
 import neoflex.chulkov.dto.LoanStatementRequestDto;
 import neoflex.chulkov.dto.ScoringDataDto;
+import neoflex.chulkov.exception.ScoringException;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
 
 import java.util.List;
@@ -31,11 +33,15 @@ public class CalculatorRestClient {
     }
 
     public CreditDto getCredit(ScoringDataDto scoringDataDto) {
-        return restClient
-                .post()
-                .uri("/calculator/calc")
-                .body(scoringDataDto).contentType(MediaType.APPLICATION_JSON)
-                .retrieve()
-                .body(CreditDto.class);
+        try {
+            return restClient
+                    .post()
+                    .uri("/calculator/calc")
+                    .body(scoringDataDto).contentType(MediaType.APPLICATION_JSON)
+                    .retrieve()
+                    .body(CreditDto.class);
+        } catch (HttpClientErrorException e) {
+            throw new ScoringException(e.getMessage());
+        }
     }
 }

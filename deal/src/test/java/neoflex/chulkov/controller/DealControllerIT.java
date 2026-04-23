@@ -11,12 +11,16 @@ import neoflex.chulkov.entity.Statement;
 import neoflex.chulkov.repository.ClientRepository;
 import neoflex.chulkov.repository.StatementRepository;
 import neoflex.chulkov.service.ClientService;
+import neoflex.chulkov.service.KafkaProducerService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.kafka.core.KafkaAdmin;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
@@ -41,6 +45,12 @@ public class DealControllerIT {
     ClientService clientService;
     @Autowired
     StatementRepository statementRepository;
+    @Mock
+    private KafkaProducerService kafkaProducerService;
+    @Mock
+    private KafkaAdmin kafkaAdmin;
+    @Mock
+    private KafkaTemplate<String, Object> kafkaTemplate;
 
     @Test
     @DisplayName("Создается и сохраняется в бд клиент и заявление и насыщаются полями из request, возвращается список из 4 вариантов кредита")

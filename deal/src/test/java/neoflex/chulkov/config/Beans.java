@@ -8,15 +8,17 @@ import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
 
 @Configuration
-public class Beans {
+class Beans {
     @Bean
     @Primary
-    public RestClient getRestClient(
-            @Value("${deal.calculator-base-url:http://localhost:54321}") String baseUrl
+    public RestClient testRestClient(
+            @Value("${statement.deal-base-url:http://localhost:54321}") String baseUrl
     ) {
+        org.springframework.web.client.RestTemplate restTemplate = new org.springframework.web.client.RestTemplate();
+
         return RestClient.builder()
                 .baseUrl(baseUrl)
-                .requestFactory(new SimpleClientHttpRequestFactory())
+                .requestFactory(restTemplate.getRequestFactory())
                 .build();
     }
 }

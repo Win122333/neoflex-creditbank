@@ -84,11 +84,9 @@ public class DealService {
 
 
         Client client = statement.getClient();
-        EmailMessage messageToMail = emailMessageMapper.messageFromClient(client);
-        messageToMail.setStatementId(statement.getStatementId().toString());
-
-
-        kafkaProducerService.sendFinishRegistration(messageToMail);
+        kafkaProducerService.sendFinishRegistration(
+                emailMessageMapper.createEmailMessageDto(client, statement.getStatementId().toString())
+        );
 
         log.info("Предложение успешно применено. Статус заявки {} обновлен на {}", dto.getStatementId(), ApplicationStatus.APPROVED);
     }
@@ -113,9 +111,7 @@ public class DealService {
 
 
         Client client = statement.getClient();
-        EmailMessage emailMessage = emailMessageMapper.messageFromClient(client);
-        emailMessage.setStatementId(statementId);
-
+        EmailMessage emailMessage = emailMessageMapper.createEmailMessageDto(client, statementId);
 
         try{
             CreditDto creditDto = calculatorRestClient.getCredit(scoringData);
