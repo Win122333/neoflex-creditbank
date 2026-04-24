@@ -2,10 +2,7 @@ package neoflex.chulkov.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import neoflex.chulkov.dto.EmailMessage;
-import neoflex.chulkov.dto.Message;
-import neoflex.chulkov.dto.EmailSendDocumentsDto;
-import neoflex.chulkov.dto.SesMessageDto;
+import neoflex.chulkov.dto.*;
 import neoflex.chulkov.dto.enums.Theme;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.Acknowledgment;
@@ -18,7 +15,7 @@ import org.thymeleaf.context.Context;
 public class DossierService {
     private final MailSenderService mailSenderService;
 
-    @KafkaListener(topics = "dossier.kafka.topic.finish-registration")
+    @KafkaListener(topics = "${dossier.kafka.topic.finish-registration:finish-registration}")
     public void consumeFinishRegistration(EmailMessage dto, Acknowledgment ack) {
         log.info("Получено сообщение из Kafka finish-registration, {}", dto);
         processAndSend(dto, dto.email(), dto.statementId(), "mail/finish-registration", "client", Theme.FINISH_REGISTRATION, ack);
@@ -40,6 +37,12 @@ public class DossierService {
     public void consumeSendSes(SesMessageDto dto, Acknowledgment ack) {
         log.info("Получено сообщение из Kafka create-ses: {}", dto);
         processAndSend(dto, dto.email(), dto.statementId(), "mail/sign-ses-documents", "client", Theme.SEND_SES, ack);
+    }
+
+    @KafkaListener(topics = "${dossier.kafka.topic.credit-issued}")
+    public void consumeCreditIssued(CreditIssuedDto dto, Acknowledgment ack) {
+        log.info("Получено сообщение из Kafka credit-issued: {}", dto);
+        processAndSend(dto, dto.email(), dto.statementId(), "mail/credit-issued", "client", Theme.CREDIT_ISSUED, ack);
     }
 
     /**

@@ -2,6 +2,7 @@ package neoflex.chulkov.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import neoflex.chulkov.dto.CreditIssuedDto;
 import neoflex.chulkov.dto.EmailMessage;
 import neoflex.chulkov.dto.EmailSendDocumentsDto;
 import neoflex.chulkov.dto.SesMessageDto;
@@ -55,7 +56,7 @@ public class KafkaProducerService {
                 kafkaTemplate.send(statementDeniedTopic, message.getStatementId(), message);
         future.whenComplete(handleCallbacks(message.getStatementId()));
     }
-    public void sendCreditIssued(EmailMessage message) {
+    public void sendCreditIssued(CreditIssuedDto message) {
         log.info("отправлено в kafka " + creditIssuedTopic + " topic");
         CompletableFuture<SendResult<String, Object>> future =
                 kafkaTemplate.send(creditIssuedTopic, message.getStatementId(), message);

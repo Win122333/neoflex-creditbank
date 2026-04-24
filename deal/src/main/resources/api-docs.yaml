@@ -52,6 +52,12 @@ paths:
           description: ID заявки
           schema:
             type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SesCodeRequestDto'
       responses:
         '201':
           description: Документы подписаны
@@ -436,8 +442,29 @@ components:
         ses:
           type: string
           description: ses код для подтверждения
-
-
+    SesCodeRequestDto:
+      type: object
+      properties:
+        ses:
+          type: string
+          description: ses код для подтверждения
+    CreditIssuedDto:
+      type: object
+      description: дто для отправки сообщения на почту об успехе выдачи креита
+      properties:
+        email:
+          type: string
+          format: email
+          pattern: "^[a-z0-9A-Z_!#$%&'*+/=?`{|}~^.-]+@[a-z0-9A-Z.-]+$"
+        statementId:
+          type: string
+        firstName:
+          type: string
+          pattern: '^[a-zA-Z]{2,30}?$'
+          description: "Имя (2 - 30 латинских символов)"
+        lastName:
+          type: string
+          pattern: '^[a-zA-Z]{2,30}?$'
 #    Theme:
 #      description: "Тема письма"
 #      type: string

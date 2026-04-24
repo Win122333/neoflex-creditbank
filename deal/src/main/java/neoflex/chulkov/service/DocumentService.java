@@ -3,6 +3,7 @@ package neoflex.chulkov.service;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import neoflex.chulkov.dto.CreditIssuedDto;
 import neoflex.chulkov.dto.EmailSendDocumentsDto;
 import neoflex.chulkov.dto.SesMessageDto;
 import neoflex.chulkov.dto.StatementStatusHistoryDto;
@@ -11,6 +12,7 @@ import neoflex.chulkov.dto.enums.ChangeType;
 import neoflex.chulkov.entity.Client;
 import neoflex.chulkov.entity.Statement;
 import neoflex.chulkov.exception.InvalidStatementStatusException;
+import neoflex.chulkov.exception.WrongSesCodeException;
 import neoflex.chulkov.mapper.CreditMapper;
 import org.springframework.stereotype.Service;
 
@@ -52,7 +54,6 @@ public class DocumentService {
         statementService.saveStatement(statement);
         log.info("creditDto {}", statement.getCredit());
 
-
         kafkaProducerService.sendDocuments(message);
         log.info("Отправлено сообщение в топик send-documents");
     }
@@ -76,7 +77,39 @@ public class DocumentService {
                 .statementId(statementId);
 
         kafkaProducerService.sendSes(message);
-        log.info("Отправлено сообщение в топик sign-document");
+        log.info("Отправлено сообщение в топик send-ses");
+    }
+    @Transactional
+    public void codeDocument(String statementId, String sesCode) {
+        Statement statement = statementService.getStatementById(UUID.fromString(statementId));
+        if (!statement.getSesCode().equals(sesCode)) {
+            throw new WrongSesCodeException("Неверный ses код");
+        }
+        Client client = statement.getClient();
+        log.info("статус заявки изменен DOCUMENT_SIGNED");
+        statement.setStatus(ApplicationStatus.DOCUMENT_SIGNED);
+        statement.getStatusHistory().add(new StatementStatusHistoryDto(
+                ApplicationStatus.DOCUMENT_SIGNED,
+                OffsetDateTime.now(),
+                ChangeType.AUTOMATIC
+        ));
+        statementService.saveStatement(statement);
+        log.info("статус заявки изменен CREDIT_ISSUED");
+        statement.setStatus(ApplicationStatus.CREDIT_ISSUED);
+        statement.getStatusHistory().add(new StatementStatusHistoryDto(
+                ApplicationStatus.CREDIT_ISSUED,
+                OffsetDateTime.now(),
+                ChangeType.AUTOMATIC
+        ));
+        statementService.saveStatement(statement);
+
+        kafkaProducerService.sendCreditIssued(new CreditIssuedDto()
+                .email(client.getEmail())
+                .statementId(statementId)
+                .firstName(client.getFirstName())
+                .lastName(client.getLastName())
+        );
+        log.info("Отправлено сообщение в топик credit-issued");
     }
 
     private String generateSesCode() {

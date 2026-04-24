@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import neoflex.chulkov.dto.FinishRegistrationRequestDto;
 import neoflex.chulkov.dto.LoanOfferDto;
 import neoflex.chulkov.dto.LoanStatementRequestDto;
+import neoflex.chulkov.dto.SesCodeRequestDto;
 import neoflex.chulkov.service.DealService;
 import neoflex.chulkov.service.DocumentService;
 import org.springframework.http.HttpStatus;
@@ -35,9 +36,10 @@ public class DealApiDelegateImpl implements DealApiDelegate {
     }
 
     @Override
-    public ResponseEntity<Void> codeDocuments(String statementId) {
+    public ResponseEntity<Void> codeDocuments(String statementId, SesCodeRequestDto sesCodeRequestDto) {
         log.info("called /deal/document/{statementId}/code with statementId = {}", statementId);
-        return DealApiDelegate.super.codeDocuments(statementId);
+        documentService.codeDocument(statementId, sesCodeRequestDto.getSes());
+        return ResponseEntity.ok().build();
     }
 
     @Override

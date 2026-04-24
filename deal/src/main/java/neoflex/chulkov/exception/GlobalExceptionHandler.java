@@ -40,6 +40,15 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(response);
     }
 
+    @ExceptionHandler(WrongSesCodeException.class)
+    public ResponseEntity<ErrorResponseDto> handleWrongSesCode(WrongSesCodeException e) {
+        log.warn("Неправильно введеные данные: {}", e.getMessage());
+        ErrorResponseDto response = new ErrorResponseDto()
+                .status(HttpStatus.BAD_REQUEST.value())
+                .error("Ошибка ses")
+                .message("Ввели не верный ses код");
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+    }
     @ExceptionHandler(HttpClientErrorException.class)
     public ResponseEntity<ErrorResponseDto> handleHttpClientErrorException(HttpClientErrorException e) {
         log.warn("Неправильно введеные данные: {}", e.getMessage());

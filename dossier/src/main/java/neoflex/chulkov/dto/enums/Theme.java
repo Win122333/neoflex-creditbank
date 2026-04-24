@@ -4,7 +4,7 @@ public enum Theme {
     FINISH_REGISTRATION("Завершение регистрации"),
     CREATE_DOCUMENT("Создание документов"),
     SEND_DOCUMENTS("Отправка документов"),
-    SEND_SES("Отправка ПЕП"),
+    SEND_SES("Подтверждение документов"),
     CREDIT_ISSUED("Проблема с кредитом"),
     STATEMENT_DENIED("Заявление отклонено");
 
