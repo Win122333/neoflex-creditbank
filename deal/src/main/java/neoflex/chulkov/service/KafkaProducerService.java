@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import neoflex.chulkov.dto.EmailMessage;
 import neoflex.chulkov.dto.EmailSendDocumentsDto;
+import neoflex.chulkov.dto.SesMessageDto;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
@@ -42,7 +43,7 @@ public class KafkaProducerService {
                 kafkaTemplate.send(createDocumentsTopic, message.getStatementId(), message);
         future.whenComplete(handleCallbacks(message.getStatementId()));
     }
-    public void sendSes(EmailMessage message) {
+    public void sendSes(SesMessageDto message) {
         log.info("отправлено в kafka " + sesTopic + " topic");
         CompletableFuture<SendResult<String, Object>> future =
                 kafkaTemplate.send(sesTopic, message.getStatementId(), message);

@@ -4,8 +4,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import neoflex.chulkov.dto.EmailMessage;
 import neoflex.chulkov.dto.Message;
-import neoflex.chulkov.dto.EmailMessageRequestDto;
 import neoflex.chulkov.dto.EmailSendDocumentsDto;
+import neoflex.chulkov.dto.SesMessageDto;
 import neoflex.chulkov.dto.enums.Theme;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.Acknowledgment;
@@ -18,32 +18,29 @@ import org.thymeleaf.context.Context;
 public class DossierService {
     private final MailSenderService mailSenderService;
 
-    @KafkaListener(topics = "finish-registration")
+    @KafkaListener(topics = "dossier.kafka.topic.finish-registration")
     public void consumeFinishRegistration(EmailMessage dto, Acknowledgment ack) {
         log.info("Получено сообщение из Kafka finish-registration, {}", dto);
         processAndSend(dto, dto.email(), dto.statementId(), "mail/finish-registration", "client", Theme.FINISH_REGISTRATION, ack);
     }
 
-    @KafkaListener(topics = "create-documents")
+    @KafkaListener(topics = "${dossier.kafka.topic.create-documents}")
     public void consumeCreateDocuments(EmailMessage dto, Acknowledgment ack) {
         log.info("Получено сообщение из Kafka create-documents, {}", dto);
         processAndSend(dto, dto.email(), dto.statementId(), "mail/create-documents", "client", Theme.CREATE_DOCUMENT, ack);
     }
 
-    @KafkaListener(topics = "send-documents")
+    @KafkaListener(topics = "${dossier.kafka.topic.send-documents}")
     public void consumeSendDocuments(EmailSendDocumentsDto dto, Acknowledgment ack) {
         log.info("Получено сообщение из Kafka send-documents: {}", dto);
         processAndSend(dto, dto.email(), dto.statementId(), "mail/send-documents", "message", Theme.SEND_DOCUMENTS, ack);
     }
 
-    // Раскомментируй и используй по аналогии:
-    /*
-    @KafkaListener(topics = "create-ses")
-    public void consumeSendSes(EmailMessageRequestDto dto, Acknowledgment ack) {
+    @KafkaListener(topics = "${dossier.kafka.topic.send-ses}")
+    public void consumeSendSes(SesMessageDto dto, Acknowledgment ack) {
         log.info("Получено сообщение из Kafka create-ses: {}", dto);
-        processAndSend(dto, dto.email(), dto.statementId(), "mail/sing-ses-documents", "client", Theme.SEND_SES, ack);
+        processAndSend(dto, dto.email(), dto.statementId(), "mail/sign-ses-documents", "client", Theme.SEND_SES, ack);
     }
-    */
 
     /**
      * Универсальный метод для отправки любого письма

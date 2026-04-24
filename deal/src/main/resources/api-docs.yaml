@@ -423,7 +423,19 @@ components:
           type: string
         creditDto:
           $ref: '#/components/schemas/CreditDto'
-
+    SesMessageDto:
+      type: object
+      description: дто для отправки ses на почту
+      properties:
+        email:
+          type: string
+          format: email
+          pattern: "^[a-z0-9A-Z_!#$%&'*+/=?`{|}~^.-]+@[a-z0-9A-Z.-]+$"
+        statementId:
+          type: string
+        ses:
+          type: string
+          description: ses код для подтверждения
 
 
 #    Theme:

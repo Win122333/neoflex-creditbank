@@ -30,7 +30,8 @@ public class DealApiDelegateImpl implements DealApiDelegate {
     @Override
     public ResponseEntity<Void> signDocuments(String statementId) {
         log.info("called /deal/document/{statementId}/sign with statementId = {}", statementId);
-        return DealApiDelegate.super.signDocuments(statementId);
+        documentService.signDocument(statementId);
+        return ResponseEntity.ok().build();
     }
 
     @Override

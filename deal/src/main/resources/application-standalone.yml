@@ -23,7 +23,7 @@ deal:
       finish-registration: "finish-registration"
       create-documents: "create-documents"
       send-documents: "send-documents"
-      send-ses: "sens-ses"
+      send-ses: "send-ses"
       credit-issued: "credit-issued"
       statement-denied: "statement-denied"
 

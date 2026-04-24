@@ -20,27 +20,14 @@
 <body>
 <div class="container">
     <h2 class="header">Электронная подпись документов</h2>
-
-    <p th:text="|Здравствуйте, ${client.firstName} ${client.lastName}!|"></p>
+    <p>Здравствуйте!</p>
 
     <p>Вы инициировали процесс подписания кредитных документов. Ниже указан ваш одноразовый секретный код (SES-код), который является аналогом вашей собственноручной подписи.</p>
 
     <div class="ses-code-box">
         <p style="margin: 0 0 10px 0; font-size: 14px; color: #7f8c8d;">Ваш код подтверждения:</p>
-        <div class="ses-code" th:text="${client.sesCode}">1234</div>
+        <div class="ses-code" th:text="${client.ses}">1234</div>
     </div>
-
-    <p>Номер вашей заявки: <strong th:text="${client.statementId}">000000</strong></p>
-
-    <p>Для подписания документов и завершения сделки, пожалуйста, введите код ниже:</p>
-
-    <form th:action="@{'http://localhost:8082/deal/document/' + ${client.statementId} + '/sign/code'}" method="post">
-        <input type="text" name="code" class="input-field" placeholder="Введите код" required>
-        <br>
-        <button type="submit" class="button" style="border: none; cursor: pointer;">
-            Подписать документы
-        </button>
-    </form>
 
     <div class="footer">
         <p>С уважением, Ваш кредитный Банк</p>

@@ -1,6 +1,13 @@
 dossier:
   kafka:
     bootstrap: localhost:29092,localhost:39092,localhost:49092
+    topic:
+      finish-registration: "finish-registration"
+      create-documents: "create-documents"
+      send-documents: "send-documents"
+      send-ses: "send-ses"
+      credit-issued: "credit-issued"
+      statement-denied: "statement-denied"
 spring:
   mail:
     host: localhost
