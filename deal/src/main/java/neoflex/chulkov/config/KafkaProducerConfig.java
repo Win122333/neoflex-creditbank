@@ -18,7 +18,7 @@ import java.util.Map;
 @Configuration
 public class KafkaProducerConfig {
     @Bean
-    public ProducerFactory<String, EmailMessage> producerFactory(
+    public ProducerFactory<String, Object> producerFactory(
             @Value("${deal.kafka-bootstrap:localhost:29092,localhost:39092,localhost:49092}") String bootstrapServers,
             ObjectMapper objectMapper
     ) {
@@ -31,8 +31,8 @@ public class KafkaProducerConfig {
     }
 
     @Bean
-    public KafkaTemplate<String, EmailMessage> kafkaTemplate(
-            ProducerFactory<String, EmailMessage> producerFactory
+    public KafkaTemplate<String, Object> kafkaTemplate(
+            ProducerFactory<String, Object> producerFactory
     ) {
         return new KafkaTemplate<>(producerFactory);
     }

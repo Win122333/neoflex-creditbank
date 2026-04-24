@@ -91,7 +91,7 @@ public class DealService {
         log.info("Предложение успешно применено. Статус заявки {} обновлен на {}", dto.getStatementId(), ApplicationStatus.APPROVED);
     }
 
-    @Transactional
+    @Transactional(dontRollbackOn = ScoringException.class)
     public void calculateCredit(FinishRegistrationRequestDto dto, String statementId) {
         log.info("Начало завершения регистрации и расчета кредита для заявки ID: {}", statementId);
 

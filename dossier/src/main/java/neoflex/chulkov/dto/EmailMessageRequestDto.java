@@ -2,7 +2,7 @@ package neoflex.chulkov.dto;
 
 import java.time.LocalDate;
 
-public record EmailMessage (
+public record EmailMessageRequestDto(
         String firstName,
         String lastName,
         String middleName,

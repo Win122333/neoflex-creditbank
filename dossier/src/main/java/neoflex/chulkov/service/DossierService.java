@@ -3,6 +3,9 @@ package neoflex.chulkov.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import neoflex.chulkov.dto.EmailMessage;
+import neoflex.chulkov.dto.Message;
+import neoflex.chulkov.dto.EmailMessageRequestDto;
+import neoflex.chulkov.dto.EmailSendDocumentsDto;
 import neoflex.chulkov.dto.enums.Theme;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.Acknowledgment;
@@ -16,61 +19,61 @@ public class DossierService {
     private final MailSenderService mailSenderService;
 
     @KafkaListener(topics = "finish-registration")
-    public void consumeFinishRegistration(EmailMessage message, Acknowledgment acknowledgment) {
-        log.info("Получено сообщение из Kafka finish-registration,  {}", message);
-
-        sendMail("mail/finish-registration", message, acknowledgment, Theme.FINISH_REGISTRATION);
+    public void consumeFinishRegistration(EmailMessage dto, Acknowledgment ack) {
+        log.info("Получено сообщение из Kafka finish-registration, {}", dto);
+        processAndSend(dto, dto.email(), dto.statementId(), "mail/finish-registration", "client", Theme.FINISH_REGISTRATION, ack);
     }
+
     @KafkaListener(topics = "create-documents")
-    public void consumeCreateDocuments(EmailMessage message, Acknowledgment acknowledgment) {
-        log.info("Получено сообщение из Kafka create-documents,  {}", message);
-
-        sendMail("mail/create-documents", message, acknowledgment, Theme.CREATE_DOCUMENT);
+    public void consumeCreateDocuments(EmailMessage dto, Acknowledgment ack) {
+        log.info("Получено сообщение из Kafka create-documents, {}", dto);
+        processAndSend(dto, dto.email(), dto.statementId(), "mail/create-documents", "client", Theme.CREATE_DOCUMENT, ack);
     }
+
     @KafkaListener(topics = "send-documents")
-    public void consumeSendDocuments(EmailMessage message, Acknowledgment acknowledgment) {
-        log.info("Получено сообщение из Kafka send-documents: {}", message);
-
-        sendMail("mail/send-documents", message, acknowledgment, Theme.SEND_DOCUMENTS);
+    public void consumeSendDocuments(EmailSendDocumentsDto dto, Acknowledgment ack) {
+        log.info("Получено сообщение из Kafka send-documents: {}", dto);
+        processAndSend(dto, dto.email(), dto.statementId(), "mail/send-documents", "message", Theme.SEND_DOCUMENTS, ack);
     }
+
+    // Раскомментируй и используй по аналогии:
+    /*
     @KafkaListener(topics = "create-ses")
-    public void consumeSendSes(EmailMessage message, Acknowledgment acknowledgment) {
-        log.info("Получено сообщение из Kafka create-ses: {}", message);
-
-        sendMail("mail/sing-ses-documents", message, acknowledgment, Theme.SEND_SES);
+    public void consumeSendSes(EmailMessageRequestDto dto, Acknowledgment ack) {
+        log.info("Получено сообщение из Kafka create-ses: {}", dto);
+        processAndSend(dto, dto.email(), dto.statementId(), "mail/sing-ses-documents", "client", Theme.SEND_SES, ack);
     }
-    @KafkaListener(topics = "credit-issued")
-    public void consumeCreditIssued(EmailMessage message, Acknowledgment acknowledgment) {
-        log.info("Получено сообщение из Kafka credit-issued: {}", message);
+    */
 
-        sendMail("mail/credit-issued", message, acknowledgment, Theme.CREDIT_ISSUED);
-    }
-    @KafkaListener(topics = "statement-denied")
-    public void consumeStatementDenied(EmailMessage message, Acknowledgment acknowledgment) {
-        log.info("Получено сообщение из Kafka statement-denied: {}", message);
-
-        sendMail("mail/statement-denied", message, acknowledgment, Theme.STATEMENT_DENIED);
-    }
-    private void sendMail(
-            String htmlTemplate,
-            EmailMessage message,
-            Acknowledgment acknowledgment,
-            Theme theme
+    /**
+     * Универсальный метод для отправки любого письма
+     * @param payload Сам объект DTO (любого класса), который уйдет в Thymeleaf
+     * @param email Почта клиента
+     * @param statementId ID заявки для логов
+     * @param template Путь к HTML-шаблону
+     * @param contextVar Имя переменной внутри HTML-шаблона (например, "client" или "message")
+     * @param theme Тема письма
+     * @param ack Подтверждение для Kafka
+     */
+    private void processAndSend(
+            Object payload,
+            String email,
+            String statementId,
+            String template,
+            String contextVar,
+            Theme theme,
+            Acknowledgment ack
     ) {
         Context context = new Context();
-        context.setVariable("client",message);
+        context.setVariable(contextVar, payload);
+
+        Message emailMessage = new Message(email, theme);
 
         try {
-            mailSenderService.send(
-                    message,
-                    theme.getTitle(),
-                    htmlTemplate,
-                    context
-            );
-            acknowledgment.acknowledge();
+            mailSenderService.send(emailMessage, template, context);
+            ack.acknowledge();
         } catch (Exception e) {
-            log.error("Ошибка при отправке письма для заявки {}: {}",
-                    message.statementId(), e.getMessage());
+            log.error("Ошибка при отправке письма для заявки {}: {}", statementId, e.getMessage());
             throw e;
         }
     }

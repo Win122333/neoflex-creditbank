@@ -3,6 +3,7 @@ package neoflex.chulkov.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import neoflex.chulkov.dto.EmailMessage;
+import neoflex.chulkov.dto.EmailSendDocumentsDto;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
@@ -15,7 +16,7 @@ import java.util.function.BiConsumer;
 @Service
 @RequiredArgsConstructor
 public class KafkaProducerService {
-    private final KafkaTemplate<String, EmailMessage> kafkaTemplate;
+    private final KafkaTemplate<String, Object> kafkaTemplate;
     @Value("${deal.kafka.topic.finish-registration:finish-registration}")
     private String finishRegistrationTopic;
     @Value("${deal.kafka.topic.create-documents:create-documents}")
@@ -31,41 +32,41 @@ public class KafkaProducerService {
 
     public void sendFinishRegistration(EmailMessage message) {
         log.info("отправлено в kafka " + finishRegistrationTopic + " topic");
-        CompletableFuture<SendResult<String, EmailMessage>> future =
+        CompletableFuture<SendResult<String, Object>> future =
                 kafkaTemplate.send(finishRegistrationTopic, message.getStatementId(), message);
         future.whenComplete(handleCallbacks(message.getStatementId()));
     }
     public void sendCreateDocuments(EmailMessage message) {
         log.info("отправлено в kafka " + createDocumentsTopic + " topic");
-        CompletableFuture<SendResult<String, EmailMessage>> future =
+        CompletableFuture<SendResult<String, Object>> future =
                 kafkaTemplate.send(createDocumentsTopic, message.getStatementId(), message);
         future.whenComplete(handleCallbacks(message.getStatementId()));
     }
     public void sendSes(EmailMessage message) {
         log.info("отправлено в kafka " + sesTopic + " topic");
-        CompletableFuture<SendResult<String, EmailMessage>> future =
+        CompletableFuture<SendResult<String, Object>> future =
                 kafkaTemplate.send(sesTopic, message.getStatementId(), message);
         future.whenComplete(handleCallbacks(message.getStatementId()));
     }
     public void sendStatementDenied(EmailMessage message) {
         log.info("отправлено в kafka " + statementDeniedTopic + " topic");
-        CompletableFuture<SendResult<String, EmailMessage>> future =
+        CompletableFuture<SendResult<String, Object>> future =
                 kafkaTemplate.send(statementDeniedTopic, message.getStatementId(), message);
         future.whenComplete(handleCallbacks(message.getStatementId()));
     }
     public void sendCreditIssued(EmailMessage message) {
         log.info("отправлено в kafka " + creditIssuedTopic + " topic");
-        CompletableFuture<SendResult<String, EmailMessage>> future =
+        CompletableFuture<SendResult<String, Object>> future =
                 kafkaTemplate.send(creditIssuedTopic, message.getStatementId(), message);
         future.whenComplete(handleCallbacks(message.getStatementId()));
     }
-    public void sendDocuments(EmailMessage message) {
+    public void sendDocuments(EmailSendDocumentsDto message) {
         log.info("отправлено в kafka " + sendDocumentsTopic + " topic");
-        CompletableFuture<SendResult<String, EmailMessage>> future =
+        CompletableFuture<SendResult<String, Object>> future =
                 kafkaTemplate.send(sendDocumentsTopic, message.getStatementId(), message);
         future.whenComplete(handleCallbacks(message.getStatementId()));
     }
-    private BiConsumer<SendResult<String, EmailMessage>, Throwable> handleCallbacks(String id) {
+    private BiConsumer<SendResult<String, Object>, Throwable> handleCallbacks(String id) {
         return (res, e) -> {
             if (e == null) {
                 log.info("Успешно отправлено в topic == {}, partition == {}, offset == {}, statementId == {}",

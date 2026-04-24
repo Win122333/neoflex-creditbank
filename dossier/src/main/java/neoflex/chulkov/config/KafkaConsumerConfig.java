@@ -1,6 +1,5 @@
 package neoflex.chulkov.config;
 
-import neoflex.chulkov.dto.EmailMessage;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,7 +17,7 @@ import java.util.Map;
 @Configuration
 public class KafkaConsumerConfig {
     @Bean
-    public ConsumerFactory<String, EmailMessage> consumerFactory(
+    public ConsumerFactory<String, Object> consumerFactory(
             @Value("${dossier.kafka.bootstrap:localhost:29092,localhost:39092,localhost:49092}") String bootstrapServers
     ) {
         Map<String, Object> properties = new HashMap<>();
@@ -33,10 +32,10 @@ public class KafkaConsumerConfig {
         return new DefaultKafkaConsumerFactory<>(properties);
     }
     @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, EmailMessage> kafkaListenerContainerFactory(
-            ConsumerFactory<String, EmailMessage> consumerFactory
+    public ConcurrentKafkaListenerContainerFactory<String, Object> kafkaListenerContainerFactory(
+            ConsumerFactory<String, Object> consumerFactory
     ) {
-        ConcurrentKafkaListenerContainerFactory<String, EmailMessage> factory =
+        ConcurrentKafkaListenerContainerFactory<String, Object> factory =
                 new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory);
         factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.MANUAL_IMMEDIATE);

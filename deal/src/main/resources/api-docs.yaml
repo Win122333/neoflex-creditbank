@@ -379,7 +379,7 @@ components:
         - message
     EmailMessage:
       type: object
-      description: сообщение для кафки
+      description: сообщение для отправки mail пользователю
       properties:
         firstName:
           type: string
@@ -401,6 +401,28 @@ components:
           description: "Дата рождения (должна быть в прошлом, возраст >= 18 лет)"
         statementId:
           type: string
+    EmailSendDocumentsDto:
+      type: object
+      description: сообщение для формирования документов
+      properties:
+        firstName:
+          type: string
+          pattern: '^[a-zA-Z]{2,30}?$'
+          description: "Имя (2 - 30 латинских символов)"
+        lastName:
+          type: string
+          pattern: '^[a-zA-Z]{2,30}?$'
+        middleName:
+          type: string
+          pattern: '^[a-zA-Z]{2,30}?$'
+        email:
+          type: string
+          format: email
+          pattern: "^[a-z0-9A-Z_!#$%&'*+/=?`{|}~^.-]+@[a-z0-9A-Z.-]+$"
+        statementId:
+          type: string
+        creditDto:
+          $ref: '#/components/schemas/CreditDto'
 
 
 

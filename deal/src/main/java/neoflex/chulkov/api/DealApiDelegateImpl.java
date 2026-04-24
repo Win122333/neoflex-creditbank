@@ -23,7 +23,8 @@ public class DealApiDelegateImpl implements DealApiDelegate {
     @Override
     public ResponseEntity<Void> sendDocuments(String statementId) {
         log.info("called /deal/document/{statementId}/send with statementId = {}", statementId);
-        return DealApiDelegate.super.sendDocuments(statementId);
+        documentService.sendDocuments(statementId);
+        return ResponseEntity.ok().build();
     }
 
     @Override
