@@ -31,7 +31,6 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class DocumentService {
     private final StatementService statementService;
-    private final KafkaProducerService kafkaProducerService;
     private final CreditMapper creditMapper;
     private final ObjectMapper objectMapper;
     private final OutboxService outboxService;
