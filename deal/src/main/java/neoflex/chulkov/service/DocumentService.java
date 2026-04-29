@@ -37,6 +37,7 @@ public class DocumentService {
     private final ObjectMapper objectMapper;
     private final OutboxService outboxService;
     private final KafkaTopics kafkaTopics;
+    private final SesCodeService sesCodeService;
 
     @Transactional
     public void sendDocuments(String statementId) throws JsonProcessingException {
@@ -83,7 +84,7 @@ public class DocumentService {
         }
 
         Client client = statement.getClient();
-        String sesCode = generateSesCode();
+        String sesCode = sesCodeService.generateSesCode();
         statement.setSesCode(sesCode);
         statementService.saveStatement(statement);
         log.debug("сохранили в statement ses code");
@@ -141,11 +142,5 @@ public class DocumentService {
             Timestamp.from(Instant.now())
         ));
         log.info("Отправлено сообщение в топик credit-issued");
-    }
-
-    private String generateSesCode() {
-        SecureRandom rnd = new SecureRandom();
-        log.info("сгенерирован ses code");
-        return String.valueOf(100_000 + rnd.nextInt(900_000));
     }
 }
