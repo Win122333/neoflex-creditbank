@@ -21,25 +21,25 @@ public class DossierService {
         processAndSend(dto, dto.email(), dto.statementId(), "mail/finish-registration", "client", Theme.FINISH_REGISTRATION, ack);
     }
 
-    @KafkaListener(topics = "${dossier.kafka.topic.create-documents}")
+    @KafkaListener(topics = "${dossier.kafka.topic.create-documents:create-documents}")
     public void consumeCreateDocuments(EmailMessage dto, Acknowledgment ack) {
         log.info("Получено сообщение из Kafka create-documents, {}", dto);
         processAndSend(dto, dto.email(), dto.statementId(), "mail/create-documents", "client", Theme.CREATE_DOCUMENT, ack);
     }
 
-    @KafkaListener(topics = "${dossier.kafka.topic.send-documents}")
+    @KafkaListener(topics = "${dossier.kafka.topic.send-documents:send-documents}")
     public void consumeSendDocuments(EmailSendDocumentsDto dto, Acknowledgment ack) {
         log.info("Получено сообщение из Kafka send-documents: {}", dto);
         processAndSend(dto, dto.email(), dto.statementId(), "mail/send-documents", "message", Theme.SEND_DOCUMENTS, ack);
     }
 
-    @KafkaListener(topics = "${dossier.kafka.topic.send-ses}")
+    @KafkaListener(topics = "${dossier.kafka.topic.send-ses:send-ses}")
     public void consumeSendSes(SesMessageDto dto, Acknowledgment ack) {
         log.info("Получено сообщение из Kafka create-ses: {}", dto);
         processAndSend(dto, dto.email(), dto.statementId(), "mail/sign-ses-documents", "client", Theme.SEND_SES, ack);
     }
 
-    @KafkaListener(topics = "${dossier.kafka.topic.credit-issued}")
+    @KafkaListener(topics = "${dossier.kafka.topic.credit-issued:credit-issued}")
     public void consumeCreditIssued(CreditIssuedDto dto, Acknowledgment ack) {
         log.info("Получено сообщение из Kafka credit-issued: {}", dto);
         processAndSend(dto, dto.email(), dto.statementId(), "mail/credit-issued", "client", Theme.CREDIT_ISSUED, ack);

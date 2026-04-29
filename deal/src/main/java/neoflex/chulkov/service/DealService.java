@@ -1,5 +1,7 @@
 package neoflex.chulkov.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -8,16 +10,21 @@ import neoflex.chulkov.dto.*;
 import neoflex.chulkov.dto.enums.ApplicationStatus;
 import neoflex.chulkov.dto.enums.ChangeType;
 import neoflex.chulkov.dto.enums.CreditStatus;
+import neoflex.chulkov.dto.enums.OutboxStatus;
 import neoflex.chulkov.entity.Client;
 import neoflex.chulkov.entity.Credit;
+import neoflex.chulkov.entity.Outbox;
 import neoflex.chulkov.entity.Statement;
 import neoflex.chulkov.exception.InvalidStatementStatusException;
 import neoflex.chulkov.exception.ScoringException;
 import neoflex.chulkov.mapper.CreditMapper;
 import neoflex.chulkov.mapper.EmailMessageMapper;
 import neoflex.chulkov.mapper.ScoringDataMapper;
+import neoflex.chulkov.util.KafkaTopics;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -34,6 +41,9 @@ public class DealService {
     private final CreditMapper creditMapper;
     private final KafkaProducerService kafkaProducerService;
     private final EmailMessageMapper emailMessageMapper;
+    private final OutboxService outboxService;
+    private final KafkaTopics kafkaTopics;
+    private final ObjectMapper objectMapper;
 
     @Transactional
     public List<LoanOfferDto> createStatement(LoanStatementRequestDto dto) {
@@ -84,15 +94,28 @@ public class DealService {
 
 
         Client client = statement.getClient();
-        kafkaProducerService.sendFinishRegistration(
-                emailMessageMapper.createEmailMessageDto(client, statement.getStatementId().toString())
-        );
-
+        EmailMessage emailMessage = emailMessageMapper.createEmailMessageDto(
+            client, statement.getStatementId().toString());
+        try {
+            outboxService.save(new Outbox(
+                null,
+                statement.getStatementId().toString(),
+                objectMapper.writeValueAsString(emailMessage),
+                kafkaTopics.getFinishRegistrationTopic(),
+                OutboxStatus.WAIT,
+                Timestamp.from(Instant.now())
+            ));
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
         log.info("Предложение успешно применено. Статус заявки {} обновлен на {}", dto.getStatementId(), ApplicationStatus.APPROVED);
     }
 
     @Transactional(dontRollbackOn = ScoringException.class)
-    public void calculateCredit(FinishRegistrationRequestDto dto, String statementId) {
+    public void calculateCredit(
+            FinishRegistrationRequestDto dto,
+            String statementId
+        ) {
         log.info("Начало завершения регистрации и расчета кредита для заявки ID: {}", statementId);
 
         Statement statement = statementService.getStatementById(UUID.fromString(statementId));
@@ -108,7 +131,6 @@ public class DealService {
         ScoringDataDto scoringData = scoringDataMapper.toScoringDataDto(statement, dto);
         log.debug("calculateCredit with scoringData = {}", scoringData);
         log.info("Отправка данных на скоринг в калькулятор для заявки {}", statementId);
-
 
         Client client = statement.getClient();
         EmailMessage emailMessage = emailMessageMapper.createEmailMessageDto(client, statementId);
@@ -133,7 +155,14 @@ public class DealService {
                     )
             );
             statementService.saveStatement(statement);
-            kafkaProducerService.sendCreateDocuments(emailMessage);
+            outboxService.save(new Outbox(
+                null,
+                statementId,
+                objectMapper.writeValueAsString(emailMessage),
+                kafkaTopics.getCreateDocumentsTopic(),
+                OutboxStatus.WAIT,
+                Timestamp.from(Instant.now())
+            ));
             log.info("Заявка {} успешно прошла скоринг и данные отправлены в topic create-documents", statementId);
         }
         catch (ScoringException e) {
@@ -145,9 +174,22 @@ public class DealService {
                     ChangeType.AUTOMATIC
             ));
             statementService.saveStatement(statement);
-            kafkaProducerService.sendStatementDenied(emailMessage);
+            try {
+                outboxService.save(new Outbox(
+                    null,
+                    statementId,
+                    objectMapper.writeValueAsString(emailMessage),
+                    kafkaTopics.getStatementDeniedTopic(),
+                    OutboxStatus.WAIT,
+                    Timestamp.from(Instant.now())
+                ));
+            } catch (JsonProcessingException ex) {
+                throw new RuntimeException(ex);
+            }
             log.info("Статус заявки {} изменен на CC_DENIED из-за отказа скоринга", statementId);
             throw new ScoringException(e.getMessage());
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
         }
     }
 }

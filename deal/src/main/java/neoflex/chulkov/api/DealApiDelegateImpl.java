@@ -1,5 +1,6 @@
 package neoflex.chulkov.api;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import neoflex.chulkov.dto.FinishRegistrationRequestDto;
@@ -24,21 +25,33 @@ public class DealApiDelegateImpl implements DealApiDelegate {
     @Override
     public ResponseEntity<Void> sendDocuments(String statementId) {
         log.info("called /deal/document/{statementId}/send with statementId = {}", statementId);
-        documentService.sendDocuments(statementId);
+        try {
+            documentService.sendDocuments(statementId);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
         return ResponseEntity.ok().build();
     }
 
     @Override
     public ResponseEntity<Void> signDocuments(String statementId) {
         log.info("called /deal/document/{statementId}/sign with statementId = {}", statementId);
-        documentService.signDocument(statementId);
+        try {
+            documentService.signDocument(statementId);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
         return ResponseEntity.ok().build();
     }
 
     @Override
     public ResponseEntity<Void> codeDocuments(String statementId, SesCodeRequestDto sesCodeRequestDto) {
         log.info("called /deal/document/{statementId}/code with statementId = {}", statementId);
-        documentService.codeDocument(statementId, sesCodeRequestDto.getSes());
+        try {
+            documentService.codeDocument(statementId, sesCodeRequestDto.getSes());
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
         return ResponseEntity.ok().build();
     }
 

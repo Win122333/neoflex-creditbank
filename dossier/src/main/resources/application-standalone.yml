@@ -1,6 +1,9 @@
 dossier:
   kafka:
     bootstrap: localhost:29092,localhost:39092,localhost:49092
+    consumer:
+      properties:
+        spring.json.use.type.headers: false
     topic:
       finish-registration: "finish-registration"
       create-documents: "create-documents"

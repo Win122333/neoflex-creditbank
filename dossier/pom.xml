@@ -55,11 +55,6 @@
             <artifactId>micrometer-registry-prometheus</artifactId>
             <scope>compile</scope>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>org.openapitools</groupId>-->
-<!--            <artifactId>jackson-databind-nullable</artifactId>-->
-<!--            <version>${jackson-databind-version}</version>-->
-<!--        </dependency>-->
         <dependency>
             <groupId>org.springframework.kafka</groupId>
             <artifactId>spring-kafka</artifactId>
@@ -73,96 +68,13 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-thymeleaf</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
-<!--            <plugin>-->
-<!--                <groupId>org.codehaus.mojo</groupId>-->
-<!--                <artifactId>build-helper-maven-plugin</artifactId>-->
-<!--                <version>3.5.0</version>-->
-<!--                <executions>-->
-<!--                    <execution>-->
-<!--                        <id>add-source</id>-->
-<!--                        <phase>generate-sources</phase>-->
-<!--                        <goals>-->
-<!--                            <goal>add-source</goal>-->
-<!--                        </goals>-->
-<!--                        <configuration>-->
-<!--                            <sources>-->
-<!--                                <source>${project.build.directory}/generated-sources/openapi/src/main/java</source>-->
-<!--                            </sources>-->
-<!--                        </configuration>-->
-<!--                    </execution>-->
-<!--                </executions>-->
-<!--            </plugin>-->
-<!--            <plugin>-->
-<!--                <groupId>org.openapitools</groupId>-->
-<!--                <artifactId>openapi-generator-maven-plugin</artifactId>-->
-<!--                <version>7.9.0</version>-->
-<!--                <executions>-->
-<!--                    <execution>-->
-<!--                        <goals>-->
-<!--                            <goal>generate</goal>-->
-<!--                        </goals>-->
-<!--                        <configuration>-->
-<!--                            <inputSpec>${project.basedir}/src/main/resources/api-docs.yaml</inputSpec>-->
-<!--                            <generatorName>spring</generatorName>-->
-<!--                            <apiPackage>neoflex.chulkov.api</apiPackage>-->
-<!--                            <modelPackage>neoflex.chulkov.dto</modelPackage>-->
-<!--                            <invokerPackage>neoflex.chulkov</invokerPackage>-->
-<!--                            <supportingFilesToGenerate>ApiUtil.java</supportingFilesToGenerate>-->
-<!--                            <configOptions>-->
-<!--                                <interfaceOnly>false</interfaceOnly>-->
-<!--                                <delegatePattern>true</delegatePattern>-->
-<!--                                <useSpringBoot3>true</useSpringBoot3>-->
-<!--                                <useJakartaEe>true</useJakartaEe>-->
-<!--                                <serializableModel>true</serializableModel>-->
-<!--                            </configOptions>-->
-
-<!--&lt;!&ndash;                            <typeMappings>&ndash;&gt;-->
-<!--&lt;!&ndash;                                <typeMapping>ApplicationStatus=neoflex.chulkov.dto.enums.ApplicationStatus</typeMapping>&ndash;&gt;-->
-<!--&lt;!&ndash;                                <typeMapping>ChangeType=neoflex.chulkov.dto.enums.ChangeType</typeMapping>&ndash;&gt;-->
-<!--&lt;!&ndash;                                <typeMapping>Gender=neoflex.chulkov.dto.enums.Gender</typeMapping>&ndash;&gt;-->
-<!--&lt;!&ndash;                                <typeMapping>MaritalStatus=neoflex.chulkov.dto.enums.MaritalStatus</typeMapping>&ndash;&gt;-->
-<!--&lt;!&ndash;                            </typeMappings>&ndash;&gt;-->
-
-<!--&lt;!&ndash;                            <importMappings>&ndash;&gt;-->
-<!--&lt;!&ndash;                                <importMapping>ApplicationStatus=neoflex.chulkov.dto.enums.ApplicationStatus</importMapping>&ndash;&gt;-->
-<!--&lt;!&ndash;                                <importMapping>ChangeType=neoflex.chulkov.dto.enums.ChangeType</importMapping>&ndash;&gt;-->
-<!--&lt;!&ndash;                                <importMapping>Gender=neoflex.chulkov.dto.enums.Gender</importMapping>&ndash;&gt;-->
-<!--&lt;!&ndash;                                <importMapping>MaritalStatus=neoflex.chulkov.dto.enums.MaritalStatus</importMapping>&ndash;&gt;-->
-<!--&lt;!&ndash;                            </importMappings>&ndash;&gt;-->
-<!--                        </configuration>-->
-<!--                    </execution>-->
-<!--                </executions>-->
-<!--            </plugin>-->
-<!--            <plugin>-->
-<!--                <groupId>org.openapitools</groupId>-->
-<!--                <artifactId>openapi-generator-maven-plugin</artifactId>-->
-<!--                <version>${openapi-generator-version}</version>-->
-<!--                <executions>-->
-<!--                    <execution>-->
-<!--                        <goals>-->
-<!--                            <goal>generate</goal>-->
-<!--                        </goals>-->
-<!--                        <configuration>-->
-<!--                            <inputSpec>${project.basedir}/src/main/resources/api-docs.yaml</inputSpec>-->
-<!--                            <generatorName>spring</generatorName>-->
-<!--                            <apiPackage>neoflex.chulkov.api</apiPackage>-->
-<!--                            <modelPackage>neoflex.chulkov.dto</modelPackage>-->
-<!--                            <invokerPackage>neoflex.chulkov</invokerPackage>-->
-<!--                            <configOptions>-->
-<!--                                <interfaceOnly>false</interfaceOnly>-->
-<!--                                <delegatePattern>true</delegatePattern>-->
-<!--                                <useSpringBoot3>true</useSpringBoot3>-->
-<!--                                <useJakartaEe>true</useJakartaEe>-->
-<!--                                <serializableModel>true</serializableModel>-->
-<!--                            </configOptions>-->
-<!--                        </configuration>-->
-<!--                    </execution>-->
-<!--                </executions>-->
-<!--            </plugin>-->
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
