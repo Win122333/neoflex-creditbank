@@ -1,3 +1,5 @@
+server:
+  port: 8084
 dossier:
   kafka:
     bootstrap: localhost:29092,localhost:39092,localhost:49092
@@ -23,3 +25,15 @@ spring:
           auth: false
           starttls:
             enable: false
+management:
+  health:
+    livenessstate:
+      enabled: true
+    readinessstate:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include:
+          - health
+          - prometheus

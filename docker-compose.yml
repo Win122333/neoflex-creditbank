@@ -10,7 +10,7 @@ services:
       - "5432:5432"
     volumes:
       - ./data/postgres:/var/lib/postgresql/data
-    restart: always
+    restart: unless-stopped
 
   creditbank-metrics:
     image: victoriametrics/victoria-metrics:v1.93.12
@@ -22,7 +22,7 @@ services:
       - ./data/victoria:/victoria-metrics-data
     command:
       - "-promscrape.config=/promscrape.yaml"
-    restart: always
+    restart: unless-stopped
     depends_on:
       - postgres
 
@@ -33,7 +33,7 @@ services:
       - "3000:3000"
     volumes:
       - grafana-storage:/var/lib/grafana
-    restart: always
+    restart: unless-stopped
 
   controller-1:
     image: apache/kafka:latest
