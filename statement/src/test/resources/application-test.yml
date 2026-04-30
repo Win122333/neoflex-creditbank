@@ -1,0 +1,5 @@
+statement:
+  deal-base-url: http://localhost:54321
+spring:
+  main:
+    allow-bean-definition-overriding: true

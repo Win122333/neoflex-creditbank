@@ -66,7 +66,7 @@ public class DealService {
         log.debug("Текущий статус заявки {}: {}", dto.getStatementId(), statement.getStatus());
 
         if (statement.getStatus() != ApplicationStatus.PREAPPROVAL)
-            throw new InvalidStatementStatusException("Заяка не находится в статусе PREAPPROVAL");
+            throw new InvalidStatementStatusException("Заявка не находится в статусе PREAPPROVAL");
 
         statement
                 .setStatus(ApplicationStatus.APPROVED)

@@ -7,7 +7,8 @@ import org.mockito.Mockito;
 
 import java.time.LocalDate;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class AdultValidatorTest {
     private AdultValidator validator;
