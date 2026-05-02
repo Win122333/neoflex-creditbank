@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
-@Profile("standalone")
+@Profile({"standalone", "test"})
 public class TestSesCodeService implements SesCodeService {
     @Override
     public String generateSesCode() {

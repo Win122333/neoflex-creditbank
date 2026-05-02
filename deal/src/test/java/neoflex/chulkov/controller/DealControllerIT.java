@@ -7,20 +7,19 @@ import neoflex.chulkov.dto.LoanStatementRequestDto;
 import neoflex.chulkov.dto.enums.ApplicationStatus;
 import neoflex.chulkov.dto.enums.CreditStatus;
 import neoflex.chulkov.entity.Client;
+import neoflex.chulkov.entity.Credit;
 import neoflex.chulkov.entity.Statement;
 import neoflex.chulkov.repository.ClientRepository;
+import neoflex.chulkov.repository.CreditRepository;
 import neoflex.chulkov.repository.StatementRepository;
 import neoflex.chulkov.service.ClientService;
-import neoflex.chulkov.service.KafkaProducerService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.kafka.core.KafkaAdmin;
-import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
@@ -34,9 +33,9 @@ import static org.junit.jupiter.api.Assertions.*;
 @Transactional
 @SpringBootTest
 @AutoConfigureMockMvc
+@ActiveProfiles("test")
 @WireMockTest(httpPort = 54321)
 public class DealControllerIT {
-
     @Autowired
     MockMvc mockMvc;
     @Autowired
@@ -45,13 +44,8 @@ public class DealControllerIT {
     ClientService clientService;
     @Autowired
     StatementRepository statementRepository;
-    @Mock
-    private KafkaProducerService kafkaProducerService;
-    @Mock
-    private KafkaAdmin kafkaAdmin;
-    @Mock
-    private KafkaTemplate<String, Object> kafkaTemplate;
-
+    @Autowired
+    CreditRepository creditRepository;
     @Test
     @DisplayName("Создается и сохраняется в бд клиент и заявление и насыщаются полями из request, возвращается список из 4 вариантов кредита")
     void statement_RequestIsValid_ReturnsListOf4LoanOfferDtoAndSaveClientAndStatement() throws Exception {
@@ -368,5 +362,112 @@ public class DealControllerIT {
         assertNotNull(finalStatement.getCredit(), "Кредит не был создан!");
         assertEquals(CreditStatus.CALCULATED, finalStatement.getCredit().getCreditStatus());
         assertEquals(0, BigDecimal.valueOf(500000).compareTo(finalStatement.getCredit().getAmount()));
+    }
+    @Test
+    @DisplayName("Отправка документов: статус меняется на DOCUMENT_CREATED и формируется сообщение в кафку")
+    void sendDocuments_RequestIsValid_ShouldUpdateStatusToDocumentCreated() throws Exception {
+        Client client = clientService.createClient(new LoanStatementRequestDto()
+            .amount(BigDecimal.valueOf(50000))
+            .term(12)
+            .firstName("Vlad")
+            .lastName("Simonyan")
+            .middleName("Igorevich")
+            .email("arte2m@example.com")
+            .birthday(LocalDate.parse("1995-03-23"))
+            .passportNumber("1234")
+            .passportSeries("567890"));
+
+        Credit credit = new Credit();
+        credit.setAmount(BigDecimal.valueOf(50000));
+        credit.setTerm(12);
+        credit.setMonthlyPayment(BigDecimal.valueOf(5000));
+        credit.setRate(BigDecimal.valueOf(15));
+        credit.setPsk(BigDecimal.valueOf(15.5));
+        credit.setInsuranceEnabled(false);
+        credit.setSalaryClient(false);
+        credit.setCreditStatus(CreditStatus.CALCULATED);
+
+        credit = creditRepository.save(credit);
+
+        Statement statement = new Statement();
+        statement.setStatus(ApplicationStatus.CC_APPROVED);
+        statement.setClient(client);
+        statement.setCredit(credit);
+        statement = statementRepository.save(statement);
+
+        UUID statementId = statement.getStatementId();
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/deal/document/{statementId}/send", statementId)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(MockMvcResultMatchers.status().isOk());
+
+        Statement updatedStatement = statementRepository.findById(statementId).orElseThrow();
+        assertEquals(ApplicationStatus.DOCUMENT_CREATED, updatedStatement.getStatus());
+    }
+
+    @Test
+    @DisplayName("Подписание документов: генерируется SES-код и отправляется сообщение на подписание")
+    void signDocuments_RequestIsValid_ShouldGenerateSesCode() throws Exception {
+        Client client = clientService.createClient(new LoanStatementRequestDto()
+            .amount(BigDecimal.valueOf(50000))
+            .term(12)
+            .firstName("Vlad")
+            .lastName("Simonyan")
+            .middleName("Igorevich")
+            .email("arte2m@example.com")
+            .birthday(LocalDate.parse("1995-03-23"))
+            .passportNumber("1234")
+            .passportSeries("567890"));
+
+        Statement statement = new Statement();
+        statement.setStatus(ApplicationStatus.DOCUMENT_CREATED);
+        statement.setClient(client);
+        statement = statementRepository.save(statement);
+
+        UUID statementId = statement.getStatementId();
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/deal/document/{statementId}/sign", statementId)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(MockMvcResultMatchers.status().isOk());
+
+        Statement updatedStatement = statementRepository.findById(statementId).orElseThrow();
+        assertNotNull(updatedStatement.getSesCode(), "SES-код должен быть сгенерирован и сохранен");
+    }
+
+    @Test
+    @DisplayName("Ввод SES-кода: при верном коде статус заявки меняется на CREDIT_ISSUED")
+    void codeDocuments_RequestIsValid_ShouldUpdateStatusToCreditIssued() throws Exception {
+        Client client = clientService.createClient(new LoanStatementRequestDto()
+            .amount(BigDecimal.valueOf(50000))
+            .term(12)
+            .firstName("Vlad")
+            .lastName("Simonyan")
+            .middleName("Igorevich")
+            .email("arte2m@example.com")
+            .birthday(LocalDate.parse("1995-03-23"))
+            .passportNumber("1234")
+            .passportSeries("567890"));
+
+        String validSesCode = "123456";
+
+        Statement statement = new Statement();
+        statement.setStatus(ApplicationStatus.DOCUMENT_CREATED);
+        statement.setClient(client);
+        statement.setSesCode(validSesCode);
+        statement = statementRepository.save(statement);
+
+        UUID statementId = statement.getStatementId();
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/deal/document/{statementId}/code", statementId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                                {
+                                    "ses": "123456"
+                                }
+                                """))
+            .andExpect(MockMvcResultMatchers.status().isOk());
+
+        Statement updatedStatement = statementRepository.findById(statementId).orElseThrow();
+        assertEquals(ApplicationStatus.CREDIT_ISSUED, updatedStatement.getStatus());
     }
 }

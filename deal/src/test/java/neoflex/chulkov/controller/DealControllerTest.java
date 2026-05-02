@@ -222,4 +222,48 @@ class DealControllerTest {
                 .andExpect(jsonPath("$.error").value("Возраст не может быть меньше 18 лет"))
                 .andExpect(jsonPath("$.message").value("Ошибка валидации"));
     }
+    @Test
+    @DisplayName("Отправка документов: должен вернуть 200 OK")
+    void sendDocuments_ShouldReturnOk() throws Exception {
+        String statementId = UUID.randomUUID().toString();
+
+        Mockito.when(dealApiDelegate.sendDocuments(statementId))
+            .thenReturn(ResponseEntity.ok().build());
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/deal/document/{statementId}/send", statementId)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("Подписание документов: должен вернуть 200 OK")
+    void signDocuments_ShouldReturnOk() throws Exception {
+        String statementId = UUID.randomUUID().toString();
+
+        Mockito.when(dealApiDelegate.signDocuments(statementId))
+            .thenReturn(ResponseEntity.ok().build());
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/deal/document/{statementId}/sign", statementId)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("Проверка SES кода: должен вернуть 200 OK при валидном коде")
+    void codeDocuments_ShouldReturnOk() throws Exception {
+        String statementId = UUID.randomUUID().toString();
+        String sesCodeJson = """
+                {
+                  "ses": "123456"
+                }
+                """;
+
+        Mockito.when(dealApiDelegate.codeDocuments(any(String.class), any()))
+            .thenReturn(ResponseEntity.ok().build());
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/deal/document/{statementId}/code", statementId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(sesCodeJson))
+            .andExpect(status().isOk());
+    }
 }

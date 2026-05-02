@@ -31,22 +31,18 @@
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <version>${lombok-version}</version>
-            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>
-            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
-            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-validation</artifactId>
-            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -62,7 +58,6 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
-            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.postgresql</groupId>
@@ -73,7 +68,6 @@
             <groupId>org.mapstruct</groupId>
             <artifactId>mapstruct</artifactId>
             <version>${mapstruct-version}</version>
-            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.testcontainers</groupId>
@@ -89,12 +83,10 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
-            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>io.micrometer</groupId>
             <artifactId>micrometer-registry-prometheus</artifactId>
-            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.openapitools</groupId>
@@ -160,7 +152,6 @@
                                 <typeMapping>ChangeType=neoflex.chulkov.dto.enums.ChangeType</typeMapping>
                                 <typeMapping>Gender=neoflex.chulkov.dto.enums.Gender</typeMapping>
                                 <typeMapping>MaritalStatus=neoflex.chulkov.dto.enums.MaritalStatus</typeMapping>
-<!--                                <typeMapping>Theme=neoflex.chulkov.dto.enums.Theme</typeMapping>-->
                             </typeMappings>
 
                             <importMappings>
@@ -168,7 +159,6 @@
                                 <importMapping>ChangeType=neoflex.chulkov.dto.enums.ChangeType</importMapping>
                                 <importMapping>Gender=neoflex.chulkov.dto.enums.Gender</importMapping>
                                 <importMapping>MaritalStatus=neoflex.chulkov.dto.enums.MaritalStatus</importMapping>
-<!--                                <importMapping>Theme=neoflex.chulkov.dto.enums.Theme</importMapping>-->
                             </importMappings>
                         </configuration>
                     </execution>

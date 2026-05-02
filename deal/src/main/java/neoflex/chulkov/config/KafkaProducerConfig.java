@@ -1,8 +1,6 @@
 package neoflex.chulkov.config;
 
-import org.springframework.kafka.support.serializer.JsonSerializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import neoflex.chulkov.dto.EmailMessage;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.beans.factory.annotation.Value;

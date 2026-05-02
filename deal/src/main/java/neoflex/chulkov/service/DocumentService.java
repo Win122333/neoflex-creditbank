@@ -38,7 +38,7 @@ public class DocumentService {
     private final SesCodeService sesCodeService;
 
     @Transactional
-    public void sendDocuments(String statementId) throws JsonProcessingException {
+    public void sendDocuments(String statementId) {
         Statement statement = statementService.getStatementById(UUID.fromString(statementId));
         if (!statement.getStatus().equals(ApplicationStatus.CC_APPROVED)) {
             throw new InvalidStatementStatusException("Заявка не находится в статусе CC_APPROVED");
@@ -63,19 +63,24 @@ public class DocumentService {
         statementService.saveStatement(statement);
         log.info("creditDto {}", statement.getCredit());
 
-        outboxService.save(new Outbox(
-            null,
-            statementId,
-            objectMapper.writeValueAsString(message),
-            kafkaTopics.getSendDocumentsTopic(),
-            OutboxStatus.WAIT,
-            Timestamp.from(Instant.now())
-        ));
+        try {
+            outboxService.save(new Outbox(
+                null,
+                statementId,
+                objectMapper.writeValueAsString(message),
+                kafkaTopics.getSendDocumentsTopic(),
+                OutboxStatus.WAIT,
+                Timestamp.from(Instant.now())
+            ));
+        } catch (JsonProcessingException e) {
+            log.error("Ошибка парсинга в json", e);
+            throw new RuntimeException(e);
+        }
         log.info("Отправлено сообщение в топик send-documents");
     }
 
     @Transactional
-    public void signDocument(String statementId) throws JsonProcessingException {
+    public void signDocument(String statementId) {
         Statement statement = statementService.getStatementById(UUID.fromString(statementId));
         if (!statement.getStatus().equals(ApplicationStatus.DOCUMENT_CREATED)) {
             throw new InvalidStatementStatusException("Заявка не находится в статусе DOCUMENT_CREATED");
@@ -92,18 +97,23 @@ public class DocumentService {
                 .email(client.getEmail())
                 .statementId(statementId);
 
-        outboxService.save(new Outbox(
-            null,
-            statementId,
-            objectMapper.writeValueAsString(message),
-            kafkaTopics.getSesTopic(),
-            OutboxStatus.WAIT,
-            Timestamp.from(Instant.now())
-        ));
+        try {
+            outboxService.save(new Outbox(
+                null,
+                statementId,
+                objectMapper.writeValueAsString(message),
+                kafkaTopics.getSesTopic(),
+                OutboxStatus.WAIT,
+                Timestamp.from(Instant.now())
+            ));
+        } catch (JsonProcessingException e) {
+            log.error("Ошибка парсинга в json", e);
+            throw new RuntimeException(e);
+        }
         log.info("Отправлено сообщение в топик send-ses");
     }
     @Transactional
-    public void codeDocument(String statementId, String sesCode) throws JsonProcessingException {
+    public void codeDocument(String statementId, String sesCode) {
         Statement statement = statementService.getStatementById(UUID.fromString(statementId));
         if (!statement.getSesCode().equals(sesCode)) {
             throw new WrongSesCodeException("Неверный ses код");
@@ -131,14 +141,19 @@ public class DocumentService {
             .statementId(statementId)
             .firstName(client.getFirstName())
             .lastName(client.getLastName());
-        outboxService.save(new Outbox(
-            null,
-            statementId,
-            objectMapper.writeValueAsString(message),
-            kafkaTopics.getCreditIssuedTopic(),
-            OutboxStatus.WAIT,
-            Timestamp.from(Instant.now())
-        ));
+        try {
+            outboxService.save(new Outbox(
+                null,
+                statementId,
+                objectMapper.writeValueAsString(message),
+                kafkaTopics.getCreditIssuedTopic(),
+                OutboxStatus.WAIT,
+                Timestamp.from(Instant.now())
+            ));
+        } catch (JsonProcessingException e) {
+            log.error("Ошибка парсинга в json", e);
+            throw new RuntimeException(e);
+        }
         log.info("Отправлено сообщение в топик credit-issued");
     }
 }
