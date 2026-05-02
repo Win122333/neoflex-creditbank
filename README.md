@@ -18,23 +18,23 @@
 
 
 ## Стек технологий
--Java 17+
--Spring Boot
--Maven
--Mapstruct
--Lombok
--Mockito
--Junit 5
--Swagger
--PostgreSQL
--Liquibase
--Apache Kafka
--Transactional Outbox Pattern
--Testcontainers
--WireMock
--Micrometer & Prometheus
--VictoriaMetrics
--Docker/Docker Compose
+* Java 17+
+* Spring Boot
+* Maven
+* Mapstruct
+* Lombok
+* Mockito
+* Junit 5
+* Swagger
+* PostgreSQL
+* Liquibase
+* Apache Kafka
+* Transactional Outbox Pattern
+* Testcontainers
+* WireMock
+* Micrometer & Prometheus
+* VictoriaMetrics
+* Docker/Docker Compose
 
 
 ## Как запустить приложение
