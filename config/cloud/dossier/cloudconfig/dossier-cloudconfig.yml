@@ -1,26 +1,9 @@
-spring:
-  application:
-    name: deal
-  liquibase:
-    change-log: db/changelog/changelog-master.xml
-  jackson:
-    serialization:
-      write-dates-as-timestamps: false
-  datasource:
-    url: jdbc:postgresql://localhost:5432/deal
-    username: user
-    password: pass
-  jpa:
-    show-sql: true
-    hibernate:
-      ddl-auto: validate
-  kafka:
-    bootstrap-servers: localhost:29092,localhost:39092,localhost:49092
-
-deal:
-  calculator-base-url: lb://calculator
+dossier:
   kafka:
     bootstrap: localhost:29092,localhost:39092,localhost:49092
+    consumer:
+      properties:
+        spring.json.use.type.headers: false
     topic:
       finish-registration: "finish-registration"
       create-documents: "create-documents"
@@ -29,8 +12,17 @@ deal:
       credit-issued: "credit-issued"
       statement-denied: "statement-denied"
 
-server:
-  port: 8082
+  mail:
+    host: localhost
+    port: 1025
+    username:
+    password:
+    properties:
+      mail:
+        smtp:
+          auth: false
+          starttls:
+            enable: false
 
 eureka:
   client:
