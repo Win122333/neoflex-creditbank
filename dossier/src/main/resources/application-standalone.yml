@@ -14,6 +14,8 @@ dossier:
       credit-issued: "credit-issued"
       statement-denied: "statement-denied"
 spring:
+  application:
+    name: dossier
   mail:
     host: localhost
     port: 1025
@@ -25,6 +27,12 @@ spring:
           auth: false
           starttls:
             enable: false
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    prefer-ip-address: true
 management:
   health:
     livenessstate:
