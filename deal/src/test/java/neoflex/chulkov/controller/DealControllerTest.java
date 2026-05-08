@@ -2,6 +2,7 @@ package neoflex.chulkov.controller;
 
 import neoflex.chulkov.api.DealApiController;
 import neoflex.chulkov.api.DealApiDelegate;
+import neoflex.chulkov.api.DocumentApiDelegate;
 import neoflex.chulkov.dto.LoanOfferDto;
 import neoflex.chulkov.exception.EmailAlreadyExistsException;
 import neoflex.chulkov.exception.GlobalExceptionHandler;
@@ -18,6 +19,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -32,6 +34,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@ActiveProfiles("test")
 @AutoConfigureMockMvc
 @WebMvcTest(DealApiController.class)
 @Import(GlobalExceptionHandler.class)
@@ -107,7 +110,7 @@ class DealControllerTest {
     @Test
     void getStatement_ShouldReturnListOf4LoanOfferDto() throws Exception {
 
-        Mockito.when(dealApiDelegate.statement(any()))
+        Mockito.when(dealApiDelegate.createStatement(any()))
                 .thenReturn(ResponseEntity.status(HttpStatus.CREATED).body(listOfLoanOffers));
         mockMvc.perform(
                         MockMvcRequestBuilders.post("/deal/statement")
@@ -129,7 +132,7 @@ class DealControllerTest {
     }
     @Test
     void getStatement_ShouldReturnBadRequest() throws Exception {
-        Mockito.when(dealApiDelegate.statement(any()))
+        Mockito.when(dealApiDelegate.createStatement(any()))
                 .thenReturn(ResponseEntity.status(HttpStatus.CREATED).body(listOfLoanOffers));
         mockMvc.perform(
                         MockMvcRequestBuilders.post("/deal/statement")
@@ -151,7 +154,7 @@ class DealControllerTest {
     @Test
     @DisplayName("Должен вернуть 409 Conflict, если email уже существует")
     void statement_ShouldReturnConflict_WhenEmailAlreadyExists() throws Exception {
-        Mockito.when(dealApiDelegate.statement(any()))
+        Mockito.when(dealApiDelegate.createStatement(any()))
                 .thenThrow(new EmailAlreadyExistsException("artem@example.com"));
         mockMvc.perform(MockMvcRequestBuilders.post("/deal/statement")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -165,7 +168,7 @@ class DealControllerTest {
     @Test
     @DisplayName("Должен вернуть 404 Conflict, если заявка не найдена")
     void statement_ShouldReturnConflict_WhenStatementNotFound() throws Exception {
-        Mockito.when(dealApiDelegate.statement(any()))
+        Mockito.when(dealApiDelegate.createStatement(any()))
                 .thenThrow(new StatementNotFoundException("Заявка с ID 123 не найдена"));
 
         mockMvc.perform(MockMvcRequestBuilders.post("/deal/statement")
@@ -180,7 +183,7 @@ class DealControllerTest {
     @Test
     @DisplayName("Должен вернуть 409 Conflict при неверном статусе заявки")
     void statement_ShouldReturnConflict_WhenInvalidStatementStatus() throws Exception {
-        Mockito.when(dealApiDelegate.statement(any()))
+        Mockito.when(dealApiDelegate.createStatement(any()))
                 .thenThrow(new InvalidStatementStatusException("Заявка уже одобрена"));
 
         mockMvc.perform(MockMvcRequestBuilders.post("/deal/statement")
@@ -212,7 +215,7 @@ class DealControllerTest {
                 null
         );
 
-        Mockito.when(dealApiDelegate.statement(any())).thenThrow(exception);
+        Mockito.when(dealApiDelegate.createStatement(any())).thenThrow(exception);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/deal/statement")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -221,49 +224,5 @@ class DealControllerTest {
                 .andExpect(jsonPath("$.status").value(400))
                 .andExpect(jsonPath("$.error").value("Возраст не может быть меньше 18 лет"))
                 .andExpect(jsonPath("$.message").value("Ошибка валидации"));
-    }
-    @Test
-    @DisplayName("Отправка документов: должен вернуть 200 OK")
-    void sendDocuments_ShouldReturnOk() throws Exception {
-        String statementId = UUID.randomUUID().toString();
-
-        Mockito.when(dealApiDelegate.sendDocuments(statementId))
-            .thenReturn(ResponseEntity.ok().build());
-
-        mockMvc.perform(MockMvcRequestBuilders.post("/deal/document/{statementId}/send", statementId)
-                .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isOk());
-    }
-
-    @Test
-    @DisplayName("Подписание документов: должен вернуть 200 OK")
-    void signDocuments_ShouldReturnOk() throws Exception {
-        String statementId = UUID.randomUUID().toString();
-
-        Mockito.when(dealApiDelegate.signDocuments(statementId))
-            .thenReturn(ResponseEntity.ok().build());
-
-        mockMvc.perform(MockMvcRequestBuilders.post("/deal/document/{statementId}/sign", statementId)
-                .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isOk());
-    }
-
-    @Test
-    @DisplayName("Проверка SES кода: должен вернуть 200 OK при валидном коде")
-    void codeDocuments_ShouldReturnOk() throws Exception {
-        String statementId = UUID.randomUUID().toString();
-        String sesCodeJson = """
-                {
-                  "ses": "123456"
-                }
-                """;
-
-        Mockito.when(dealApiDelegate.codeDocuments(any(String.class), any()))
-            .thenReturn(ResponseEntity.ok().build());
-
-        mockMvc.perform(MockMvcRequestBuilders.post("/deal/document/{statementId}/code", statementId)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(sesCodeJson))
-            .andExpect(status().isOk());
     }
 }
