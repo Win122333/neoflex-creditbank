@@ -5,6 +5,11 @@ eureka:
   instance:
     prefer-ip-address: true
 
+deal:
+  base-url: lb://deal
+statement:
+  base-url: lb://statement
+
 management:
   health:
     livenessstate:

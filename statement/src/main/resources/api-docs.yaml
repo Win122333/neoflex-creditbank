@@ -112,6 +112,7 @@ components:
           type: boolean
         isSalaryClient:
           type: boolean
+
     ApplicationStatus:
       description: "Статус заявки"
       type: string

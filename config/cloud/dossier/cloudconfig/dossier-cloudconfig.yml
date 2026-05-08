@@ -12,6 +12,7 @@ dossier:
       credit-issued: "credit-issued"
       statement-denied: "statement-denied"
 
+spring:
   mail:
     host: localhost
     port: 1025
