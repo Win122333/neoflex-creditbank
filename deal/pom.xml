@@ -165,6 +165,7 @@
                                 <useSpringBoot3>true</useSpringBoot3>
                                 <useJakartaEe>true</useJakartaEe>
                                 <serializableModel>true</serializableModel>
+                                <useTags>true</useTags>
                             </configOptions>
 
                             <typeMappings>

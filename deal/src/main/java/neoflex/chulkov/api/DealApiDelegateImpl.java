@@ -19,31 +19,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class DealApiDelegateImpl implements DealApiDelegate {
     private final DealService dealService;
-    private final DocumentService documentService;
-
     @Override
-    public ResponseEntity<Void> sendDocuments(String statementId) {
-        log.info("called /deal/document/{statementId}/send with statementId = {}", statementId);
-        documentService.sendDocuments(statementId);
-        return ResponseEntity.ok().build();
-    }
-
-    @Override
-    public ResponseEntity<Void> signDocuments(String statementId) {
-        log.info("called /deal/document/{statementId}/sign with statementId = {}", statementId);
-        documentService.signDocument(statementId);
-        return ResponseEntity.ok().build();
-    }
-
-    @Override
-    public ResponseEntity<Void> codeDocuments(String statementId, SesCodeRequestDto sesCodeRequestDto) {
-        log.info("called /deal/document/{statementId}/code with statementId = {}", statementId);
-        documentService.codeDocument(statementId, sesCodeRequestDto.getSes());
-        return ResponseEntity.ok().build();
-    }
-
-    @Override
-    public ResponseEntity<Void> calculate(
+    public ResponseEntity<Void> finishRegistration(
             String statementId,
             FinishRegistrationRequestDto finishRegistrationRequestDto
     ) {
@@ -53,7 +30,7 @@ public class DealApiDelegateImpl implements DealApiDelegate {
     }
 
     @Override
-    public ResponseEntity<Void> select(
+    public ResponseEntity<Void> selectOffer(
             LoanOfferDto loanOfferDto
     ) {
         log.info("called /offer/select with dto = {}", loanOfferDto);
@@ -62,7 +39,7 @@ public class DealApiDelegateImpl implements DealApiDelegate {
     }
 
     @Override
-    public ResponseEntity<List<LoanOfferDto>> statement(
+    public ResponseEntity<List<LoanOfferDto>> createStatement(
             LoanStatementRequestDto loanStatementRequestDto
     ) {
         log.info("called /statement with dto = {}", loanStatementRequestDto);

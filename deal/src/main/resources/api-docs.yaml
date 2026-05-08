@@ -1,70 +1,22 @@
-openapi: 3.0.1
+openapi: 3.0.3
 info:
   title: API Микросервиса Deal
-  description: API для управления кредитными заявками
+  description: API для управления кредитными заявками, скоринга и жизненного цикла кредита.
   version: 1.0.0
 
+tags:
+  - name: deal
+    description: Основные операции кредитного конвейера
+  - name: document
+    description: Работа с документами и подписью (ПЭП)
+  - name: admin
+    description: Административные методы для мониторинга заявок
+
 paths:
-  /deal/document/{statementId}/send:
-    post:
-      summary: Запрос на отправку документов
-      operationId: sendDocuments
-      tags:
-        - deal
-      parameters:
-        - name: statementId
-          in: path
-          required: true
-          description: ID заявки
-          schema:
-            type: string
-      responses:
-        '201':
-          description: Запрос на отправку документов выполнен
-
-  /deal/document/{statementId}/sign:
-    post:
-      summary: Запрос на подписание документов
-      operationId: signDocuments
-      tags:
-        - deal
-      parameters:
-        - name: statementId
-          in: path
-          required: true
-          description: ID заявки
-          schema:
-            type: string
-      responses:
-        '201':
-          description: Запрос на подписание документов выполнен
-
-  /deal/document/{statementId}/code:
-    post:
-      summary: Подписание документов
-      operationId: codeDocuments
-      tags:
-        - deal
-      parameters:
-        - name: statementId
-          in: path
-          required: true
-          description: ID заявки
-          schema:
-            type: string
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/SesCodeRequestDto'
-      responses:
-        '201':
-          description: Документы подписаны
   /deal/statement:
     post:
       summary: Расчет списка кредитных предложений
-      operationId: statement
+      operationId: createStatement
       tags:
         - deal
       requestBody:
@@ -74,7 +26,7 @@ paths:
             schema:
               $ref: '#/components/schemas/LoanStatementRequestDto'
       responses:
-        '201':
+        '200':
           description: Список офферов успешно сформирован
           content:
             application/json:
@@ -82,11 +34,13 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/LoanOfferDto'
+        '400':
+          $ref: '#/components/responses/BadRequest'
 
   /deal/offer/select:
     post:
       summary: Выбор одного из предложений
-      operationId: select
+      operationId: selectOffer
       tags:
         - deal
       requestBody:
@@ -96,21 +50,21 @@ paths:
             schema:
               $ref: '#/components/schemas/LoanOfferDto'
       responses:
-        '202':
-          description: Предложение принято в работу
+        '200':
+          description: Предложение принято, статус заявки обновлен
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
 
   /deal/calculate/{statementId}:
     post:
       summary: Завершение регистрации и полный расчет кредита
-      operationId: calculate
+      operationId: finishRegistration
       tags:
         - deal
       parameters:
-        - name: statementId
-          in: path
-          required: true
-          schema:
-            type: string
+        - $ref: '#/components/parameters/StatementId'
       requestBody:
         required: true
         content:
@@ -118,11 +72,151 @@ paths:
             schema:
               $ref: '#/components/schemas/FinishRegistrationRequestDto'
       responses:
+        '200':
+          description: Данные успешно обработаны, кредит рассчитан
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /deal/document/{statementId}/send:
+    post:
+      summary: Запрос на отправку документов
+      operationId: sendDocuments
+      tags:
+        - document
+      parameters:
+        - $ref: '#/components/parameters/StatementId'
+      responses:
         '202':
-          description: Данные приняты, кредит рассчитан
+          description: Запрос принят, документы будут отправлены на почту
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /deal/document/{statementId}/sign:
+    post:
+      summary: Запрос на подписание документов
+      operationId: signDocuments
+      tags:
+        - document
+      parameters:
+        - $ref: '#/components/parameters/StatementId'
+      responses:
+        '202':
+          description: Запрос на подпись принят, код SES отправлен
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /deal/document/{statementId}/code:
+    post:
+      summary: Подписание документов вводом кода
+      operationId: verifySesCode
+      tags:
+        - document
+      parameters:
+        - $ref: '#/components/parameters/StatementId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SesCodeRequestDto'
+      responses:
+        '200':
+          description: Документы успешно подписаны, кредит выдан
+        '400':
+          description: Неверный код SES
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+
+  /deal/admin/statement/{statementId}:
+    get:
+      summary: Получить полную информацию о заявке по ID
+      operationId: getStatementById
+      tags:
+        - admin
+      parameters:
+        - $ref: '#/components/parameters/StatementId'
+      responses:
+        '200':
+          description: Заявка найдена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatementDto'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /deal/admin/statement:
+    get:
+      summary: Получить список всех заявок
+      operationId: getAllStatements
+      tags:
+        - admin
+      responses:
+        '200':
+          description: Список заявок
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/StatementDto'
 
 components:
+  parameters:
+    StatementId:
+      name: statementId
+      in: path
+      required: true
+      description: Уникальный идентификатор заявки (UUID)
+      schema:
+        type: string
+
+  responses:
+    BadRequest:
+      description: Ошибка в параметрах запроса
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponseDto'
+    NotFound:
+      description: Ресурс не найден
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponseDto'
   schemas:
+    StatementDto:
+      type: object
+      properties:
+        statementId:
+          type: string
+          format: uuid
+        clientId:
+          type: string
+          format: uuid
+        creditId:
+          type: string
+          format: uuid
+        status:
+          $ref: '#/components/schemas/ApplicationStatus'
+        creationDate:
+          type: string
+          format: date
+        appliedOffer:
+          $ref: '#/components/schemas/LoanOfferDto'
+        signDate:
+          type: string
+          format: date
+        sesCode:
+          type: string
+        statusHistory:
+          type: array
+          items:
+            $ref: '#/components/schemas/StatementStatusHistoryDto'
     FinishRegistrationRequestDto:
       type: object
       properties:
