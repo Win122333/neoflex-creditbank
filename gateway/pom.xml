@@ -20,11 +20,14 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <eureka-server.version>5.0.1</eureka-server.version>
         <lombok-version>1.18.42</lombok-version>
-        <springdoc-version>2.8.5</springdoc-version>
-        <mapstruct-version>1.6.3</mapstruct-version>
-        <wiremock-version>3.3.1</wiremock-version>
+        <springdoc.version>2.8.5</springdoc.version>
+        <mapstruct.version>1.6.3</mapstruct.version>
+        <wiremock.version>3.3.1</wiremock.version>
         <openapi-generator-version>7.9.0</openapi-generator-version>
-        <jackson-databind-version>0.2.6</jackson-databind-version>
+        <jackson-databind.version>0.2.6</jackson-databind.version>
+        <openapi-generator.version>7.9.0</openapi-generator.version>
+        <spring-cloud.version>2025.0.0</spring-cloud.version>
+        <codehaus.version>3.5.0</codehaus.version>
     </properties>
 
     <dependencyManagement>
@@ -32,7 +35,7 @@
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-dependencies</artifactId>
-                <version>2025.0.0</version>
+                <version>${spring-cloud.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -55,17 +58,17 @@
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-            <version>${springdoc-version}</version>
+            <version>${springdoc.version}</version>
         </dependency>
         <dependency>
             <groupId>org.openapitools</groupId>
             <artifactId>jackson-databind-nullable</artifactId>
-            <version>${jackson-databind-version}</version>
+            <version>${jackson-databind.version}</version>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>${lombok-version}</version>
+            <version>${lombok.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -78,7 +81,11 @@
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-            <version>${springdoc-version}</version>
+            <version>${springdoc.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
         </dependency>
     </dependencies>
     <build>
@@ -86,7 +93,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>build-helper-maven-plugin</artifactId>
-                <version>3.5.0</version>
+                <version>${codehaus.version}</version>
                 <executions>
                     <execution>
                         <id>add-source</id>
@@ -105,9 +112,61 @@
             <plugin>
                 <groupId>org.openapitools</groupId>
                 <artifactId>openapi-generator-maven-plugin</artifactId>
-                <version>7.9.0</version>
+                <version>${openapi-generator.version}</version>
                 <executions>
+
                     <execution>
+                        <id>generate-deal-client</id>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <inputSpec>${project.basedir}/src/main/resources/deal-api-docs.yaml</inputSpec>
+                            <generatorName>spring</generatorName>
+                            <library>spring-http-interface</library>
+                            <apiPackage>neoflex.chulkov.client.deal</apiPackage>
+
+                            <modelPackage>neoflex.chulkov.dto</modelPackage>
+                            <generateModels>false</generateModels>
+
+                            <generateApiTests>false</generateApiTests>
+                            <generateModelTests>false</generateModelTests>
+                            <generateSupportingFiles>false</generateSupportingFiles>
+                            <configOptions>
+                                <useSpringBoot3>true</useSpringBoot3>
+                                <useJakartaEe>true</useJakartaEe>
+                                <interfaceOnly>true</interfaceOnly>
+                            </configOptions>
+                        </configuration>
+                    </execution>
+
+                    <execution>
+                        <id>generate-statement-client</id>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <inputSpec>${project.basedir}/src/main/resources/statement-api-docs.yaml</inputSpec>
+                            <generatorName>spring</generatorName>
+                            <library>spring-http-interface</library>
+                            <apiPackage>neoflex.chulkov.client.statement</apiPackage>
+
+                            <modelPackage>neoflex.chulkov.dto</modelPackage>
+                            <generateModels>false</generateModels>
+
+                            <generateApiTests>false</generateApiTests>
+                            <generateModelTests>false</generateModelTests>
+                            <generateSupportingFiles>false</generateSupportingFiles>
+                            <configOptions>
+                                <useSpringBoot3>true</useSpringBoot3>
+                                <useJakartaEe>true</useJakartaEe>
+                                <interfaceOnly>true</interfaceOnly>
+                            </configOptions>
+                        </configuration>
+                    </execution>
+
+                    <execution>
+                        <id>generate-gateway-api</id>
                         <goals>
                             <goal>generate</goal>
                         </goals>
@@ -126,14 +185,12 @@
                                 <serializableModel>true</serializableModel>
                                 <useTags>true</useTags>
                             </configOptions>
-
                             <typeMappings>
                                 <typeMapping>ApplicationStatus=neoflex.chulkov.dto.enums.ApplicationStatus</typeMapping>
                                 <typeMapping>ChangeType=neoflex.chulkov.dto.enums.ChangeType</typeMapping>
                                 <typeMapping>Gender=neoflex.chulkov.dto.enums.Gender</typeMapping>
                                 <typeMapping>MaritalStatus=neoflex.chulkov.dto.enums.MaritalStatus</typeMapping>
                             </typeMappings>
-
                             <importMappings>
                                 <importMapping>ApplicationStatus=neoflex.chulkov.dto.enums.ApplicationStatus</importMapping>
                                 <importMapping>ChangeType=neoflex.chulkov.dto.enums.ChangeType</importMapping>
@@ -142,6 +199,7 @@
                             </importMappings>
                         </configuration>
                     </execution>
+
                 </executions>
             </plugin>
             <plugin>
@@ -154,7 +212,7 @@
                         <path>
                             <groupId>org.projectlombok</groupId>
                             <artifactId>lombok</artifactId>
-                            <version>${lombok-version}</version>
+                            <version>${lombok.version}</version>
                         </path>
                         <path>
                             <groupId>org.projectlombok</groupId>
@@ -164,7 +222,7 @@
                         <path>
                             <groupId>org.mapstruct</groupId>
                             <artifactId>mapstruct-processor</artifactId>
-                            <version>${mapstruct-version}</version>
+                            <version>${mapstruct.version}</version>
                         </path>
                     </annotationProcessorPaths>
                 </configuration>

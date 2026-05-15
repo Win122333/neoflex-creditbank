@@ -1,6 +1,5 @@
 package neoflex.chulkov.service;
 
-import neoflex.chulkov.dto.CreditDto;
 import neoflex.chulkov.dto.CreditIssuedDto;
 import neoflex.chulkov.dto.EmailMessage;
 import neoflex.chulkov.dto.EmailSendDocumentsDto;

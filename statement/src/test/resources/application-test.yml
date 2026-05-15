@@ -3,3 +3,9 @@ statement:
 spring:
   main:
     allow-bean-definition-overriding: true
+  cloud:
+    config:
+      enabled: false
+  config:
+    import-check:
+      enabled: false

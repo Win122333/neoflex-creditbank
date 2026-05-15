@@ -5,7 +5,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -22,8 +24,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         "calculator.rate=20",
         "calculator.salary.discount=1",
         "calculator.insurance.cost-in-percent=0.10",
-        "calculator.insurance.discount=5"
+        "calculator.insurance.discount=5",
+        "spring.cloud.config.enabled=false"
 })
+@ActiveProfiles("test")
 @AutoConfigureMockMvc(printOnlyOnFailure = false)
 class CalculatorControllerIT {
     @Autowired
