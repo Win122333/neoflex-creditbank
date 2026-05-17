@@ -5,6 +5,62 @@ info:
   version: 1.0.0
 
 paths:
+  /deal/document/{statementId}/send:
+    post:
+      summary: Запрос на отправку документов
+      operationId: sendDocuments
+      tags:
+        - deal
+      parameters:
+        - name: statementId
+          in: path
+          required: true
+          description: ID заявки
+          schema:
+            type: string
+      responses:
+        '201':
+          description: Запрос на отправку документов выполнен
+
+  /deal/document/{statementId}/sign:
+    post:
+      summary: Запрос на подписание документов
+      operationId: signDocuments
+      tags:
+        - deal
+      parameters:
+        - name: statementId
+          in: path
+          required: true
+          description: ID заявки
+          schema:
+            type: string
+      responses:
+        '201':
+          description: Запрос на подписание документов выполнен
+
+  /deal/document/{statementId}/code:
+    post:
+      summary: Подписание документов
+      operationId: codeDocuments
+      tags:
+        - deal
+      parameters:
+        - name: statementId
+          in: path
+          required: true
+          description: ID заявки
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SesCodeRequestDto'
+      responses:
+        '201':
+          description: Документы подписаны
   /deal/statement:
     post:
       summary: Расчет списка кредитных предложений
@@ -327,6 +383,92 @@ components:
         - status
         - error
         - message
+    EmailMessage:
+      type: object
+      description: сообщение для отправки mail пользователю
+      properties:
+        firstName:
+          type: string
+          pattern: '^[a-zA-Z]{2,30}?$'
+          description: "Имя (2 - 30 латинских символов)"
+        lastName:
+          type: string
+          pattern: '^[a-zA-Z]{2,30}?$'
+        middleName:
+          type: string
+          pattern: '^[a-zA-Z]{2,30}?$'
+        email:
+          type: string
+          format: email
+          pattern: "^[a-z0-9A-Z_!#$%&'*+/=?`{|}~^.-]+@[a-z0-9A-Z.-]+$"
+        birthday:
+          type: string
+          format: date
+          description: "Дата рождения (должна быть в прошлом, возраст >= 18 лет)"
+        statementId:
+          type: string
+    EmailSendDocumentsDto:
+      type: object
+      description: сообщение для формирования документов
+      properties:
+        firstName:
+          type: string
+          pattern: '^[a-zA-Z]{2,30}?$'
+          description: "Имя (2 - 30 латинских символов)"
+        lastName:
+          type: string
+          pattern: '^[a-zA-Z]{2,30}?$'
+        middleName:
+          type: string
+          pattern: '^[a-zA-Z]{2,30}?$'
+        email:
+          type: string
+          format: email
+          pattern: "^[a-z0-9A-Z_!#$%&'*+/=?`{|}~^.-]+@[a-z0-9A-Z.-]+$"
+        statementId:
+          type: string
+        creditDto:
+          $ref: '#/components/schemas/CreditDto'
+    SesMessageDto:
+      type: object
+      description: дто для отправки ses на почту
+      properties:
+        email:
+          type: string
+          format: email
+          pattern: "^[a-z0-9A-Z_!#$%&'*+/=?`{|}~^.-]+@[a-z0-9A-Z.-]+$"
+        statementId:
+          type: string
+        ses:
+          type: string
+          description: ses код для подтверждения
+    SesCodeRequestDto:
+      type: object
+      properties:
+        ses:
+          type: string
+          description: ses код для подтверждения
+    CreditIssuedDto:
+      type: object
+      description: дто для отправки сообщения на почту об успехе выдачи креита
+      properties:
+        email:
+          type: string
+          format: email
+          pattern: "^[a-z0-9A-Z_!#$%&'*+/=?`{|}~^.-]+@[a-z0-9A-Z.-]+$"
+        statementId:
+          type: string
+        firstName:
+          type: string
+          pattern: '^[a-zA-Z]{2,30}?$'
+          description: "Имя (2 - 30 латинских символов)"
+        lastName:
+          type: string
+          pattern: '^[a-zA-Z]{2,30}?$'
+#    Theme:
+#      description: "Тема письма"
+#      type: string
+#      enum: [ FINISH_REGISTRATION, CREATE_DOCUMENT, SEND_DOCUMENTS, SEND_SES, CREDIT_ISSUED, STATEMENT_DENIED ]
 
     ApplicationStatus:
       description: "Статус заявки"

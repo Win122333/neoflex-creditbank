@@ -12,9 +12,21 @@ spring:
     show-sql: true
     hibernate:
       ddl-auto: validate
+  kafka:
+    bootstrap-servers: localhost:29092,localhost:39092,localhost:49092
 
 deal:
   calculator-base-url: http://localhost:8081
+  kafka:
+    bootstrap: localhost:29092,localhost:39092,localhost:49092
+    topic:
+      finish-registration: "finish-registration"
+      create-documents: "create-documents"
+      send-documents: "send-documents"
+      send-ses: "send-ses"
+      credit-issued: "credit-issued"
+      statement-denied: "statement-denied"
+
 server:
   port: 8082
 

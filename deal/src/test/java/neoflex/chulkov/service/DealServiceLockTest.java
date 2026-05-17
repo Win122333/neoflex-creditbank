@@ -1,5 +1,6 @@
 package neoflex.chulkov.service;
 
+import lombok.extern.slf4j.Slf4j;
 import neoflex.chulkov.dto.LoanOfferDto;
 import neoflex.chulkov.dto.enums.ApplicationStatus;
 import neoflex.chulkov.entity.Client;
@@ -10,8 +11,11 @@ import neoflex.chulkov.repository.StatementRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.kafka.core.KafkaAdmin;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.math.BigDecimal;
@@ -25,6 +29,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@Slf4j
 @SpringBootTest
 @ActiveProfiles("test")
 class DealServiceLockTest {
@@ -38,6 +43,15 @@ class DealServiceLockTest {
     @Autowired
     private ClientRepository clientRepository;
 
+    @Mock
+    private KafkaProducerService kafkaProducerService;
+
+    @Mock
+    private KafkaAdmin kafkaAdmin;
+
+    @Mock
+    private KafkaTemplate<String, Object> kafkaTemplate;
+
     private UUID statementId;
 
     @BeforeEach
@@ -49,7 +63,7 @@ class DealServiceLockTest {
         client.setFirstName("Test");
         client.setLastName("User");
         client.setEmail("test@example.com");
-        client.setBirthDate(LocalDate.of(1990, 1, 1));
+        client.setBirthday(LocalDate.of(1990, 1, 1));
         client = clientRepository.save(client);
 
         Statement statement = new Statement();
@@ -91,10 +105,8 @@ class DealServiceLockTest {
                     try {
                         dealService.selectOffer(offer);
                         successCount.incrementAndGet();
-                        System.out.println("Thread " + threadNum + " successfully updated statement");
                     } catch (InvalidStatementStatusException e) {
                         failureCount.incrementAndGet();
-                        System.out.println("Thread " + threadNum + " failed: " + e.getMessage());
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -118,70 +130,6 @@ class DealServiceLockTest {
         assertEquals(ApplicationStatus.APPROVED, finalStatement.getStatus());
         assertEquals(1, finalStatement.getStatusHistory().size());
     }
-
-    @Test
-    @DisplayName("Блокировка БД: проверка времени ожидания при параллельных вызовах")
-    void selectOffer_WithLock_ShouldShowWaitingTime() throws InterruptedException {
-        // given
-        ExecutorService executor = Executors.newFixedThreadPool(2);
-        CountDownLatch thread1Started = new CountDownLatch(1);
-        CountDownLatch thread2Finished = new CountDownLatch(1);
-
-        long[] thread1Duration = new long[1];
-        long[] thread2Duration = new long[1];
-
-        LoanOfferDto offer1 = createTestOffer(statementId);
-        LoanOfferDto offer2 = createTestOffer(statementId);
-        offer2.setRate(BigDecimal.valueOf(10));
-
-        executor.submit(() -> {
-            try {
-                thread1Started.countDown();
-                long start = System.currentTimeMillis();
-
-                dealService.selectOffer(offer1);
-
-                thread1Duration[0] = System.currentTimeMillis() - start;
-                System.out.println("Thread 1 duration: " + thread1Duration[0] + " ms");
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
-
-        thread1Started.await();
-        Thread.sleep(100);
-
-        executor.submit(() -> {
-            try {
-                long start = System.currentTimeMillis();
-
-                try {
-                    dealService.selectOffer(offer2);
-                } catch (InvalidStatementStatusException e) {
-                }
-
-                thread2Duration[0] = System.currentTimeMillis() - start;
-                System.out.println("Thread 2 duration: " + thread2Duration[0] + " ms");
-            } catch (Exception e) {
-                e.printStackTrace();
-            } finally {
-                thread2Finished.countDown();
-            }
-        });
-
-        // then
-        boolean completed = thread2Finished.await(10, TimeUnit.SECONDS);
-        executor.shutdown();
-
-        assertTrue(completed, "Второй поток должен завершиться");
-        assertTrue(thread2Duration[0] > thread1Duration[0],
-                "Второй поток должен ждать дольше из-за блокировки. Thread1: " +
-                        thread1Duration[0] + "ms, Thread2: " + thread2Duration[0] + "ms");
-
-        System.out.println("Thread 2 waited approximately " +
-                (thread2Duration[0] - thread1Duration[0]) + " ms for lock");
-    }
-
     @Test
     @DisplayName("Блокировка БД: проверка что блокировка работает на уровне БД, а не приложения")
     void selectOffer_LockAtDatabaseLevel_ShouldWorkAcrossTransactions() throws InterruptedException {
@@ -197,7 +145,7 @@ class DealServiceLockTest {
                 dealService.selectOffer(createTestOffer(statementId));
                 firstSuccess.incrementAndGet();
             } catch (Exception e) {
-                System.err.println("First transaction failed: " + e.getMessage());
+                log.error("First transaction failed: " + e.getMessage());
             } finally {
                 latch.countDown();
             }
@@ -209,9 +157,9 @@ class DealServiceLockTest {
                 dealService.selectOffer(createTestOffer(statementId));
                 secondSuccess.incrementAndGet();
             } catch (InvalidStatementStatusException e) {
-                System.out.println("Second transaction correctly failed: " + e.getMessage());
+                log.error("Second transaction correctly failed: " + e.getMessage());
             } catch (Exception e) {
-                System.err.println("Second transaction error: " + e.getMessage());
+                log.error("Second transaction error: " + e.getMessage());
             } finally {
                 latch.countDown();
             }

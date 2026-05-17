@@ -30,6 +30,25 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
 
+    @ExceptionHandler(ScoringException.class)
+    public ResponseEntity<ErrorResponseDto> handleScoringException(ScoringException e) {
+        log.warn("Неправильно введеные данные: {}", e.getMessage());
+        ErrorResponseDto response = new ErrorResponseDto()
+                .status(HttpStatus.UNPROCESSABLE_ENTITY.value())
+                .error("Ошибка скоринга")
+                .message("К сожалению, вы не прошли скоринг");
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(response);
+    }
+
+    @ExceptionHandler(WrongSesCodeException.class)
+    public ResponseEntity<ErrorResponseDto> handleWrongSesCode(WrongSesCodeException e) {
+        log.warn("Неправильно введеные данные: {}", e.getMessage());
+        ErrorResponseDto response = new ErrorResponseDto()
+                .status(HttpStatus.BAD_REQUEST.value())
+                .error("Ошибка ses")
+                .message("Ввели не верный ses код");
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+    }
     @ExceptionHandler(HttpClientErrorException.class)
     public ResponseEntity<ErrorResponseDto> handleHttpClientErrorException(HttpClientErrorException e) {
         log.warn("Неправильно введеные данные: {}", e.getMessage());

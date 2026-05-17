@@ -11,7 +11,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@ToString
+@ToString(exclude = {"series", "number"})
 @Accessors(chain = true)
 public class Passport {
     private UUID passportUUID;

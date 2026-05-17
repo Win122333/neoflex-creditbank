@@ -16,7 +16,7 @@ public interface ScoringDataMapper {
     @Mapping(target = "firstName", source = "statement.client.firstName")
     @Mapping(target = "lastName", source = "statement.client.lastName")
     @Mapping(target = "middleName", source = "statement.client.middleName")
-    @Mapping(target = "birthdate", source = "statement.client.birthDate")
+    @Mapping(target = "birthdate", source = "statement.client.birthday")
     @Mapping(target = "passportSeries", source = "statement.client.passport.series")
     @Mapping(target = "passportNumber", source = "statement.client.passport.number")
     @Mapping(target = "passportIssueBranch", source = "finishDto.passportIssueBranch")

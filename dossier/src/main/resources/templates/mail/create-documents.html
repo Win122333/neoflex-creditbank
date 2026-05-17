@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px; }
+        .container { background-color: #ffffff; padding: 30px; border-radius: 8px; max-width: 600px; margin: auto; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        .header { color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px; }
+        .button { display: inline-block; padding: 12px 24px; background-color: #3498db; color: #ffffff; text-decoration: none; border-radius: 5px; margin-top: 20px; }
+        .footer { margin-top: 30px; font-size: 12px; color: #7f8c8d; text-align: center; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2 class="header">Формирование документов по кредиту</h2>
+
+    <p th:text="|Здравствуйте, ${client.firstName} ${client.lastName}!|"></p>
+
+    <p>Отличные новости! Ваша заявка успешно прошла финальную проверку и кредит <strong>полностью одобрен</strong>.</p>
+    <p>Для ознакомления с условиями и продолжения оформления, пожалуйста, запросите формирование кредитной документации.</p>
+
+    <p>Номер вашей заявки: <strong th:text="${client.statementId}">000000</strong></p>
+
+    <form th:action="@{'http://localhost:8082/deal/document/' + ${client.statementId} + '/send'}" method="post">
+        <button type="submit" class="button" style="border: none; cursor: pointer;">
+            Сформировать документы
+        </button>
+    </form>
+
+    <div class="footer">
+        <p>С уважением, кредитный Банк</p>
+    </div>
+</div>
+</body>
+</html>

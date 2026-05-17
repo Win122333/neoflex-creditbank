@@ -35,7 +35,7 @@ public class Client {
     private String middleName;
 
     @Column(name = "birth_date", nullable = false)
-    private LocalDate birthDate;
+    private LocalDate birthday;
 
     @Column(name = "email", nullable = false, unique = true)
     private String email;

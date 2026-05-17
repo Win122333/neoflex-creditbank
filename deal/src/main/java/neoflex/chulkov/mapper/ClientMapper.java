@@ -11,7 +11,7 @@ import org.mapstruct.*;
 public interface ClientMapper {
     @Mapping(target = "passport.series", source = "passportSeries")
     @Mapping(target = "passport.number", source = "passportNumber")
-    @Mapping(target = "birthDate", source = "birthday")
+    @Mapping(target = "birthday", source = "birthday")
     Client toClient(LoanStatementRequestDto loanStatement);
 
     @Mapping(target = "passport.issueDate", source = "passportIssueDate")

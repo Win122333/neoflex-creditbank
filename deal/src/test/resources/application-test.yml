@@ -1,0 +1,14 @@
+spring:
+#  allow-bean-definition-overriding: true
+  liquibase:
+    change-log: db/changelog/changelog-master.xml
+  datasource:
+    url: jdbc:tc:postgresql:16:///deal?TC_DAEMON
+    username: deal
+    password: deal
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+deal:
+  calculator-base-url: http://localhost:54321
