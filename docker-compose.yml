@@ -1,3 +1,5 @@
+version: '3.8'
+
 services:
   postgres:
     image: postgres:16
@@ -33,6 +35,13 @@ services:
       - "3000:3000"
     volumes:
       - grafana-storage:/var/lib/grafana
+    restart: unless-stopped
+
+  zipkin:
+    image: openzipkin/zipkin:latest
+    container_name: zipkin
+    ports:
+      - "9411:9411"
     restart: unless-stopped
 
   controller-1:
@@ -131,6 +140,86 @@ services:
       - controller-2
       - controller-3
 
+  eureka-server:
+    build: ./eureka-server
+    container_name: eureka-server
+    ports:
+      - "8761:8761"
+
+  config-server:
+    build: ./config-server
+    container_name: config-server
+    ports:
+      - "8888:8888"
+    depends_on:
+      - eureka-server
+
+  calculator:
+    build: ./calculator
+    container_name: calculator
+    depends_on:
+      - eureka-server
+      - config-server
+      - zipkin
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+      - MANAGEMENT_ZIPKIN_TRACING_ENDPOINT=http://zipkin:9411/api/v2/spans
+
+  statement:
+    build: ./statement
+    container_name: statement
+    depends_on:
+      - eureka-server
+      - config-server
+      - zipkin
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+      - MANAGEMENT_ZIPKIN_TRACING_ENDPOINT=http://zipkin:9411/api/v2/spans
+
+  deal:
+    build: ./deal
+    container_name: deal
+    depends_on:
+      - postgres
+      - broker-1
+      - broker-2
+      - broker-3
+      - eureka-server
+      - config-server
+      - zipkin
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/deal
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=broker-1:19092,broker-2:19092,broker-3:19092
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+      - MANAGEMENT_ZIPKIN_TRACING_ENDPOINT=http://zipkin:9411/api/v2/spans
+
+  dossier:
+    build: ./dossier
+    container_name: dossier
+    depends_on:
+      - broker-1
+      - broker-2
+      - broker-3
+      - eureka-server
+      - config-server
+      - zipkin
+    environment:
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=broker-1:19092,broker-2:19092,broker-3:19092
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+      - MANAGEMENT_ZIPKIN_TRACING_ENDPOINT=http://zipkin:9411/api/v2/spans
+
+  gateway:
+    build: ./gateway
+    container_name: gateway
+    ports:
+      - "8080:8080"
+    depends_on:
+      - eureka-server
+      - config-server
+      - zipkin
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+      - MANAGEMENT_ZIPKIN_TRACING_ENDPOINT=http://zipkin:9411/api/v2/spans
 
 volumes:
   grafana-storage:
