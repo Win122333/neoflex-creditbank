@@ -14,6 +14,9 @@ spring:
       ddl-auto: validate
   kafka:
     bootstrap-servers: localhost:29092,localhost:39092,localhost:49092
+    listener:
+      template:
+        observation-enabled: true
 
 deal:
   calculator-base-url: lb://calculator
@@ -35,6 +38,12 @@ eureka:
     prefer-ip-address: true
 
 management:
+  tracing:
+    sampling:
+      probability: 1.0
+    zipkin:
+      tracing:
+        endpoint: "http://zipkin:9411/api/v2/spans"
   health:
     livenessstate:
       enabled: true
