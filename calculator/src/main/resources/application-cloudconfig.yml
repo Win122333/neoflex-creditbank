@@ -1,0 +1,11 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: calculator
+  config:
+    import: 'configserver:'
+  cloud:
+    config:
+      uri: http://localhost:8888

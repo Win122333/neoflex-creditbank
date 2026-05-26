@@ -8,7 +8,7 @@ import java.security.SecureRandom;
 
 @Slf4j
 @Service
-@Profile("prod")
+@Profile({"prod", "cloud", "cloudconfig"})
 public class ProdSesCodeService implements SesCodeService{
     @Override
     public String generateSesCode() {

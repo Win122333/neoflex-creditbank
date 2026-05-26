@@ -1,0 +1,7 @@
+spring:
+  cloud:
+    config:
+      enabled: false
+  config:
+    import-check:
+      enabled: false

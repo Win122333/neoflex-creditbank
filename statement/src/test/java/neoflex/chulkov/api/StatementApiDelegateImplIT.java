@@ -38,7 +38,6 @@ class StatementApiDelegateImplIT {
     @Test
     @DisplayName("При валидных данных возвращает список из 4 предложений")
     void getAvailableCreditOffers_Return4Offers_WhenDataIsValid() throws Exception {
-        // given
         String requestBody = """
                 {
                   "amount": 500000,
@@ -53,7 +52,6 @@ class StatementApiDelegateImplIT {
                 }
                 """;
 
-        // Мокаем ответ от Deal MS
         String dealResponse = """
                 [
                   {
@@ -105,7 +103,6 @@ class StatementApiDelegateImplIT {
                         .withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
                         .withBody(dealResponse)));
 
-        // when
         MvcResult result = mockMvc.perform(MockMvcRequestBuilders
                         .post("/statement")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -117,7 +114,6 @@ class StatementApiDelegateImplIT {
                 .andExpect(jsonPath("$[3].rate").value(14))
                 .andReturn();
 
-        // then
         List<LoanOfferDto> offers = objectMapper.readValue(
                 result.getResponse().getContentAsString(),
                 objectMapper.getTypeFactory().constructCollectionType(List.class, LoanOfferDto.class)
@@ -131,7 +127,6 @@ class StatementApiDelegateImplIT {
     @Test
     @DisplayName("Данные не проходят прескоринг - сумма меньше 20000")
     void getAvailableCreditOffers_ThrowValidationException_WhenAmountLessThanMinimum() throws Exception {
-        // given
         String requestBody = """
                 {
                   "amount": 19000,
@@ -145,7 +140,6 @@ class StatementApiDelegateImplIT {
                 }
                 """;
 
-        // when & then
         MvcResult result = mockMvc.perform(MockMvcRequestBuilders
                         .post("/statement")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -165,7 +159,6 @@ class StatementApiDelegateImplIT {
     @Test
     @DisplayName("Данные не проходят валидацию - имя короче 2 символов")
     void getAvailableCreditOffers_ThrowValidationException_WhenFirstNameTooShort() throws Exception {
-        // given
         String requestBody = """
                 {
                   "amount": 500000,
@@ -179,7 +172,6 @@ class StatementApiDelegateImplIT {
                 }
                 """;
 
-        // when & then
         MvcResult result = mockMvc.perform(MockMvcRequestBuilders
                         .post("/statement")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -199,7 +191,6 @@ class StatementApiDelegateImplIT {
     @Test
     @DisplayName("Данные не проходят валидацию - некорректный email")
     void getAvailableCreditOffers_ThrowValidationException_WhenEmailIsInvalid() throws Exception {
-        // given
         String requestBody = """
                 {
                   "amount": 500000,
@@ -213,7 +204,6 @@ class StatementApiDelegateImplIT {
                 }
                 """;
 
-        // when & then
         mockMvc.perform(MockMvcRequestBuilders
                         .post("/statement")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -226,7 +216,6 @@ class StatementApiDelegateImplIT {
     @Test
     @DisplayName("Данные не проходят валидацию - серия паспорта не 4 цифры")
     void getAvailableCreditOffers_ThrowValidationException_WhenPassportSeriesInvalid() throws Exception {
-        // given
         String requestBody = """
                 {
                   "amount": 500000,
@@ -240,7 +229,6 @@ class StatementApiDelegateImplIT {
                 }
                 """;
 
-        // when & then
         mockMvc.perform(MockMvcRequestBuilders
                         .post("/statement")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -251,7 +239,6 @@ class StatementApiDelegateImplIT {
     @Test
     @DisplayName("Данные не проходят валидацию - номер паспорта не 6 цифр")
     void getAvailableCreditOffers_ThrowValidationException_WhenPassportNumberInvalid() throws Exception {
-        // given
         String requestBody = """
                 {
                   "amount": 500000,
@@ -265,7 +252,6 @@ class StatementApiDelegateImplIT {
                 }
                 """;
 
-        // when & then
         mockMvc.perform(MockMvcRequestBuilders
                         .post("/statement")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -276,7 +262,6 @@ class StatementApiDelegateImplIT {
     @Test
     @DisplayName("Deal MS возвращает 409 - пользователь уже существует")
     void getAvailableCreditOffers_HandleConflictFromDeal_WhenUserAlreadyExists() throws Exception {
-        // given
         String requestBody = """
                 {
                   "amount": 500000,
@@ -304,7 +289,6 @@ class StatementApiDelegateImplIT {
                         .withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
                         .withBody(errorResponse)));
 
-        // when & then
         mockMvc.perform(MockMvcRequestBuilders
                         .post("/statement")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -317,7 +301,6 @@ class StatementApiDelegateImplIT {
     @Test
     @DisplayName("Успешный выбор кредитного предложения")
     void selectCreditOffer_ReturnAccepted_WhenOfferIsValid() throws Exception {
-        // given
         String requestBody = """
                 {
                   "statementId": "%s",
@@ -335,7 +318,6 @@ class StatementApiDelegateImplIT {
                 .willReturn(aResponse()
                         .withStatus(HttpStatus.OK.value())));
 
-        // when & then
         mockMvc.perform(MockMvcRequestBuilders
                         .post("/statement/offer")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -347,7 +329,6 @@ class StatementApiDelegateImplIT {
     @Test
     @DisplayName("Выбор предложения - Deal MS возвращает ошибку")
     void selectCreditOffer_ThrowException_WhenDealReturnsError() throws Exception {
-        // given
         String requestBody = """
                 {
                   "statementId": "%s",
@@ -375,7 +356,6 @@ class StatementApiDelegateImplIT {
                         .withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
                         .withBody(errorResponse)));
 
-        // when & then
         mockMvc.perform(MockMvcRequestBuilders
                         .post("/statement/offer")
                         .contentType(MediaType.APPLICATION_JSON)

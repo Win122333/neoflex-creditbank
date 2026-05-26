@@ -1,6 +1,8 @@
 package neoflex.chulkov.config;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.client.loadbalancer.LoadBalancerClient;
+import org.springframework.cloud.client.loadbalancer.LoadBalancerInterceptor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestClient;
@@ -10,10 +12,12 @@ public class RestClientConfig {
     @Bean
     public RestClient getRestClient(
             RestClient.Builder builder,
-            @Value("${statement.deal-base-url:localhost:8082}") String baseUrl
+            @Value("${statement.deal-base-url:localhost:8082}") String baseUrl,
+            LoadBalancerClient loadBalancerClient
     ) {
         return builder
                 .baseUrl(baseUrl)
+                .requestInterceptor(new LoadBalancerInterceptor(loadBalancerClient))
                 .build();
     }
 }

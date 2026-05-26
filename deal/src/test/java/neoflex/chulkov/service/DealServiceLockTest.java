@@ -17,6 +17,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.kafka.core.KafkaAdmin;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -33,6 +34,14 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
 @ActiveProfiles("test")
 class DealServiceLockTest {
+    @MockitoBean
+    private KafkaProducerService kafkaProducerService;
+
+    @MockitoBean
+    private KafkaAdmin kafkaAdmin;
+
+    @MockitoBean
+    private KafkaTemplate<String, Object> kafkaTemplate;
 
     @Autowired
     private DealService dealService;
@@ -42,16 +51,6 @@ class DealServiceLockTest {
 
     @Autowired
     private ClientRepository clientRepository;
-
-    @Mock
-    private KafkaProducerService kafkaProducerService;
-
-    @Mock
-    private KafkaAdmin kafkaAdmin;
-
-    @Mock
-    private KafkaTemplate<String, Object> kafkaTemplate;
-
     private UUID statementId;
 
     @BeforeEach

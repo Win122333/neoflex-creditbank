@@ -39,7 +39,6 @@ public class DealService {
     private final CreditService creditService;
     private final ScoringDataMapper scoringDataMapper;
     private final CreditMapper creditMapper;
-    private final KafkaProducerService kafkaProducerService;
     private final EmailMessageMapper emailMessageMapper;
     private final OutboxService outboxService;
     private final KafkaTopics kafkaTopics;

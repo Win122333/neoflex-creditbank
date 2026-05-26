@@ -1,15 +1,14 @@
-calculator:
-  rate: 20
-  insurance:
-    costInPercent: 0.10
-    discount: 5
-  salary:
-    discount: 1
-springdoc:
-  swagger-ui:
-    url: /openapi.json
-server:
-  port: 8081
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    prefer-ip-address: true
+
+deal:
+  base-url: lb://deal
+statement:
+  base-url: lb://statement
 
 management:
   health:

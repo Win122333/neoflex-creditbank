@@ -17,8 +17,7 @@ import java.util.Map;
 public class KafkaProducerConfig {
     @Bean
     public ProducerFactory<String, Object> producerFactory(
-            @Value("${deal.kafka-bootstrap:localhost:29092,localhost:39092,localhost:49092}") String bootstrapServers,
-            ObjectMapper objectMapper
+            @Value("${deal.kafka-bootstrap:localhost:29092,localhost:39092,localhost:49092}") String bootstrapServers
     ) {
         Map<String, Object> properties = new HashMap<>();
         properties.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);

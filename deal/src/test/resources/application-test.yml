@@ -1,5 +1,10 @@
 spring:
-#  allow-bean-definition-overriding: true
+  cloud:
+    config:
+      enabled: false
+  config:
+    import-check:
+      enabled: false
   liquibase:
     change-log: db/changelog/changelog-master.xml
   datasource:
