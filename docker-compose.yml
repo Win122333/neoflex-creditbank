@@ -145,81 +145,136 @@ services:
     container_name: eureka-server
     ports:
       - "8761:8761"
+    environment:
+      - SPRING_PROFILES_ACTIVE=standalone
+    healthcheck:
+      test: [ "CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8761/actuator/health" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
 
   config-server:
     build: ./config-server
     container_name: config-server
     ports:
       - "8888:8888"
+    volumes:
+      - ./config/cloud:/app/config/cloud
     depends_on:
-      - eureka-server
+      eureka-server:
+        condition: service_healthy
+    environment:
+      - SPRING_PROFILES_ACTIVE=native,standalone
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+    healthcheck:
+      test: [ "CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8888/actuator/health" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
 
   calculator:
     build: ./calculator
     container_name: calculator
+    restart: on-failure
     depends_on:
-      - eureka-server
-      - config-server
-      - zipkin
+      eureka-server:
+        condition: service_started
+      config-server:
+        condition: service_started
+      zipkin:
+        condition: service_started
     environment:
+      - SPRING_PROFILES_ACTIVE=cloudconfig
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
       - MANAGEMENT_ZIPKIN_TRACING_ENDPOINT=http://zipkin:9411/api/v2/spans
+      - SPRING_CLOUD_CONFIG_URI=http://config-server:8888
 
   statement:
     build: ./statement
     container_name: statement
+    restart: on-failure
     depends_on:
-      - eureka-server
-      - config-server
-      - zipkin
+      eureka-server:
+        condition: service_started
+      config-server:
+        condition: service_started
+      zipkin:
+        condition: service_started
     environment:
+      - SPRING_PROFILES_ACTIVE=cloudconfig
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
       - MANAGEMENT_ZIPKIN_TRACING_ENDPOINT=http://zipkin:9411/api/v2/spans
+      - SPRING_CLOUD_CONFIG_URI=http://config-server:8888
 
   deal:
     build: ./deal
     container_name: deal
+    restart: on-failure
     depends_on:
-      - postgres
-      - broker-1
-      - broker-2
-      - broker-3
-      - eureka-server
-      - config-server
-      - zipkin
+      postgres:
+        condition: service_started
+      broker-1:
+        condition: service_started
+      broker-2:
+        condition: service_started
+      broker-3:
+        condition: service_started
+      eureka-server:
+        condition: service_started
+      config-server:
+        condition: service_started
+      zipkin:
+        condition: service_started
     environment:
+      - SPRING_PROFILES_ACTIVE=cloudconfig
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/deal
       - SPRING_KAFKA_BOOTSTRAP_SERVERS=broker-1:19092,broker-2:19092,broker-3:19092
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
       - MANAGEMENT_ZIPKIN_TRACING_ENDPOINT=http://zipkin:9411/api/v2/spans
+      - SPRING_CLOUD_CONFIG_URI=http://config-server:8888
 
   dossier:
     build: ./dossier
     container_name: dossier
+    restart: on-failure
     depends_on:
-      - broker-1
-      - broker-2
-      - broker-3
-      - eureka-server
-      - config-server
-      - zipkin
+      broker-1:
+        condition: service_started
+      broker-2:
+        condition: service_started
+      broker-3:
+        condition: service_started
+      eureka-server:
+        condition: service_started
+      config-server:
+        condition: service_started
+      zipkin:
+        condition: service_started
     environment:
+      - SPRING_PROFILES_ACTIVE=cloudconfig
       - SPRING_KAFKA_BOOTSTRAP_SERVERS=broker-1:19092,broker-2:19092,broker-3:19092
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
       - MANAGEMENT_ZIPKIN_TRACING_ENDPOINT=http://zipkin:9411/api/v2/spans
+      - SPRING_CLOUD_CONFIG_URI=http://config-server:8888
 
   gateway:
     build: ./gateway
     container_name: gateway
+    restart: on-failure
     ports:
-      - "8080:8080"
+      - "8085:8085"
     depends_on:
-      - eureka-server
-      - config-server
-      - zipkin
+      eureka-server:
+        condition: service_started
+      config-server:
+        condition: service_started
+      zipkin:
+        condition: service_started
     environment:
+      - SPRING_PROFILES_ACTIVE=cloudconfig
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
       - MANAGEMENT_ZIPKIN_TRACING_ENDPOINT=http://zipkin:9411/api/v2/spans
+      - SPRING_CLOUD_CONFIG_URI=http://config-server:8888
 
 volumes:
   grafana-storage:

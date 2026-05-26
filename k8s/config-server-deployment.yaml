@@ -1,0 +1,12 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: config-server
+spec:
+  selector:
+
+  template:
+    spec:
+      containers:
+        - name: config-server
+          image: 192.168.49.1:5000/

@@ -1,12 +1,11 @@
 FROM maven:3.9-eclipse-temurin-21 AS build
-COPY pom.xml /build/
-WORKDIR /build/
+WORKDIR /build
+COPY pom.xml .
 RUN mvn dependency:go-offline
-COPY src /build/src/
-RUN mvn package -DskipTests
+COPY src ./src
+RUN mvn clean package -DskipTests && rm -f target/*-plain.jar
 
-# 2. Запуск
 FROM eclipse-temurin:21-jre-alpine
-ARG JAR_FILE=/build/target/*.jar
-COPY --from=build $JAR_FILE /opt/docker-test/app.jar
-ENTRYPOINT ["java", "-jar", "/opt/docker-test/app.jar"]
+WORKDIR /app
+COPY --from=build /build/target/*.jar app.jar
+ENTRYPOINT ["java", "-jar", "app.jar"]
