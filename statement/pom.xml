@@ -24,6 +24,7 @@
         <wiremock-version>3.3.1</wiremock-version>
         <openapi-generator-version>7.9.0</openapi-generator-version>
         <jackson-databind-version>0.2.6</jackson-databind-version>
+        <jacoco-version>0.8.11</jacoco-version>
     </properties>
 
     <dependencyManagement>
@@ -205,6 +206,26 @@
                         </exclude>
                     </excludes>
                 </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>${jacoco-version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>report</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
