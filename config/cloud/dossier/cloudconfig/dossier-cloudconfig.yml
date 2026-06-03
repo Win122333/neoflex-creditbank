@@ -13,6 +13,9 @@ dossier:
       statement-denied: "statement-denied"
 
 spring:
+  kafka:
+    listeners:
+      observation-enabled: true
   mail:
     host: localhost
     port: 1025
@@ -33,6 +36,12 @@ eureka:
     prefer-ip-address: true
 
 management:
+  tracing:
+    sampling:
+      probability: 1.0
+    zipkin:
+      tracing:
+        endpoint: "http://zipkin:9411/api/v2/spans"
   health:
     livenessstate:
       enabled: true
